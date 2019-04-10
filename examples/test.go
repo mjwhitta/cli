@@ -5,7 +5,7 @@ import (
     "os"
     "strings"
 
-    "gitlab.com/mjwhitta/cli"
+    "cli"
 )
 
 var abool bool
@@ -33,10 +33,12 @@ func init() {
         },
         "",
     )
+    cli.TabWidth = 4
     cli.Bool(
         &abool,
         "a",
         "praesent",
+        // "praesentpraesentpraesentabc",
         false,
         strings.Join(
             []string{
@@ -62,7 +64,7 @@ func init() {
     cli.Int64(
         &aint,
         "c",
-        "lorem",
+        "",
         0,
         strings.Join(
             []string{
@@ -99,7 +101,7 @@ func init() {
     )
     cli.Uint64(
         &auint,
-        "f",
+        "",
         "sagittis",
         0,
         strings.Join(

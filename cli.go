@@ -9,7 +9,7 @@ import (
     "strings"
 )
 
-const Version = "1.1.1"
+const Version = "1.2.0"
 
 // Float64ListVar allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -116,6 +116,7 @@ var flags []flagVar
 var help bool
 var Info = ""
 var maxWidth = 0
+var TabWidth = 4
 
 func init() {
     flags = append(
@@ -136,9 +137,11 @@ func Args() []string {
 
 func Bool(p *bool, s string, l string, v bool, u string) {
     s, l, u = checkFlags(s, l, u)
+
     flags = append(flags, flagVar{s, l, u})
     if (len(s) > 0) {flag.BoolVar(p, s, v, u)}
     if (len(l) > 0) {flag.BoolVar(p, l, v, u)}
+
     updateMaxWidth(s, l)
 }
 
@@ -182,51 +185,63 @@ func flagToString(flag flagVar) string {
     var str strings.Builder
 
     // Leading space
-    str.WriteString("    ")
+    for i := 0; i < TabWidth; i++ {
+        str.WriteString(" ")
+    }
 
     // Flags
     var f = getFlagColumn(flag.short, flag.long)
     str.WriteString(f)
 
     // Filler
-    for j := 0; j < (maxWidth - len(f)); j++ {
+    for i := 0; i < (maxWidth - len(f)); i++ {
         str.WriteString(" ")
     }
 
     // Description
     if (maxWidth <= 32) {
-        var lines = wrap(flag.desc, 72 - maxWidth)
-        for j := range(lines) {
-            if (j > 0) {
+        var lines = wrap(flag.desc, 80 - (2 * TabWidth) - maxWidth)
+        for i := range(lines) {
+            if (i > 0) {
                 // Leading space
-                str.WriteString("    ")
+                for j := 0; j < TabWidth; j++ {
+                    str.WriteString(" ")
+                }
 
                 // Filler
-                for k := 0; k < maxWidth; k++ {
+                for j := 0; j < maxWidth; j++ {
                     str.WriteString(" ")
                 }
             }
 
             // Filler
-            str.WriteString("    ")
+            for j := 0; j < TabWidth; j++ {
+                str.WriteString(" ")
+            }
 
             // Actual description
-            str.WriteString(lines[j])
+            str.WriteString(lines[i])
             str.WriteString("\n")
         }
     } else {
         // New line b/c maxWidth is too big
         str.WriteString("\n")
 
-        var lines = wrap(flag.desc, 72)
-        for j := range(lines) {
+        var lines = wrap(flag.desc, 80 - 6 - TabWidth)
+        for i := range(lines) {
             // Leading space
-            str.WriteString("        ")
+            for j := 0; j < TabWidth; j++ {
+                str.WriteString(" ")
+            }
+
+            // Filler
+            str.WriteString("      ")
 
             // Actual description
-            str.WriteString(lines[j])
+            str.WriteString(lines[i])
             str.WriteString("\n")
         }
+        str.WriteString("\n")
     }
 
     return str.String()
@@ -234,19 +249,27 @@ func flagToString(flag flagVar) string {
 
 func Float64(p *float64, s string, l string, v float64, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=FLOAT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=FLOAT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Float64Var(p, s, v, u)}
     if (len(l) > 0) {flag.Float64Var(p, l, v, u)}
+
     updateMaxWidth(s, long)
 }
 
 func Float64List(p *Float64ListVar, s string, l string, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=FLOAT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=FLOAT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
     if (len(l) > 0) {flag.Var(p, l, u)}
+
     updateMaxWidth(s, long)
 }
 
@@ -256,6 +279,8 @@ func getFlagColumn(s string, l string) string {
     if (len(s) > 0) {
         f.WriteString("-")
         f.WriteString(s)
+    } else {
+        f.WriteString("    ")
     }
 
     if ((len(s) > 0) && (len(l) > 0)) {f.WriteString(", ")}
@@ -270,37 +295,53 @@ func getFlagColumn(s string, l string) string {
 
 func Int(p *int, s string, l string, v int, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=INT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=INT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.IntVar(p, s, v, u)}
     if (len(l) > 0) {flag.IntVar(p, l, v, u)}
+
     updateMaxWidth(s, long)
 }
 
 func Int64(p *int64, s string, l string, v int64, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=INT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=INT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Int64Var(p, s, v, u)}
     if (len(l) > 0) {flag.Int64Var(p, l, v, u)}
+
     updateMaxWidth(s, long)
 }
 
 func Int64List(p *Int64ListVar, s string, l string, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=INT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=INT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
     if (len(l) > 0) {flag.Var(p, l, u)}
+
     updateMaxWidth(s, long)
 }
 
 func IntList(p *IntListVar, s string, l string, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=INT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=INT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
     if (len(l) > 0) {flag.Var(p, l, u)}
+
     updateMaxWidth(s, long)
 }
 
@@ -323,11 +364,11 @@ func Parsed() bool {
 
 func PrintDefaults() {
     var less = func (i, j int) bool {
-        var left = flags[i].long
-        if (len(left) == 0) {left = flags[i].short}
+        var left = flags[i].short
+        if (len(left) == 0) {left = flags[i].long}
 
-        var right = flags[j].long
-        if (len(right) == 0) {right = flags[j].short}
+        var right = flags[j].short
+        if (len(right) == 0) {right = flags[j].long}
 
         return (strings.ToLower(left) < strings.ToLower(right))
     }
@@ -352,9 +393,11 @@ func PrintHeader() {
 
     header.WriteString("\nDESCRIPTION\n")
 
-    var info = wrap(Info, 76)
+    var info = wrap(Info, 80 - TabWidth)
     for i := range(info) {
-        header.WriteString("    ")
+        for j := 0; j < TabWidth; j++ {
+            header.WriteString(" ")
+        }
         header.WriteString(info[i])
         header.WriteString("\n")
     }
@@ -366,55 +409,79 @@ func PrintHeader() {
 
 func String(p *string, s string, l string, v string, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=STRING", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=STRING", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.StringVar(p, s, v, u)}
     if (len(l) > 0) {flag.StringVar(p, l, v, u)}
+
     updateMaxWidth(s, long)
 }
 
 func StringList(p *StringListVar, s string, l string, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=STRING", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=STRING", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
     if (len(l) > 0) {flag.Var(p, l, u)}
+
     updateMaxWidth(s, long)
 }
 
 func Uint(p *uint, s string, l string, v uint, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=UINT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=UINT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.UintVar(p, s, v, u)}
     if (len(l) > 0) {flag.UintVar(p, l, v, u)}
+
     updateMaxWidth(s, long)
 }
 
 func Uint64(p *uint64, s string, l string, v uint64, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=UINT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=UINT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Uint64Var(p, s, v, u)}
     if (len(l) > 0) {flag.Uint64Var(p, l, v, u)}
+
     updateMaxWidth(s, long)
 }
 
 func Uint64List(p *Uint64ListVar, s string, l string, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=UINT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=UINT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
     if (len(l) > 0) {flag.Var(p, l, u)}
+
     updateMaxWidth(s, long)
 }
 
 func UintList(p *UintListVar, s string, l string, u string) {
     s, l, u = checkFlags(s, l, u)
-    var long = fmt.Sprintf("%s=UINT", l)
+
+    var long string
+    if (len(l) > 0) {long = fmt.Sprintf("%s=UINT", l)}
+
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
     if (len(l) > 0) {flag.Var(p, l, u)}
+
     updateMaxWidth(s, long)
 }
 

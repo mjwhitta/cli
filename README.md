@@ -32,9 +32,12 @@ var astringlist cli.StringListVar
 var auint uint64
 
 func init() {
-    // Parse cli args
+    // Configure cli package
     cli.Banner = fmt.Sprintf("Usage: %s [OPTIONS] <arg>", os.Args[0])
     cli.Info = "A sample usage for the cli package"
+    cli.TabWidth = 4 // default
+
+    // Parse cli args
     cli.Bool(&abool, "b", "bool", false, "Example for bool flag")
     cli.Float64(
         &afloat,
