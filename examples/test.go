@@ -40,7 +40,7 @@ func init() {
         &abool,
         "a",
         "praesent",
-        // "praesentpraesentpraesentabc",
+        // "praesentpraesentpraesent",
         false,
         strings.Join(
             []string{
