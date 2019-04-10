@@ -5,7 +5,7 @@ import (
     "os"
     "strings"
 
-    "cli"
+    "gitlab.com/mjwhitta/cli"
 )
 
 var abool bool
@@ -17,6 +17,7 @@ var auint uint64
 
 func init() {
     // Parse cli args
+    cli.Align = false // Default
     cli.Banner = fmt.Sprintf("Usage: %s [OPTIONS] <arg>", os.Args[0])
     cli.Info = strings.Join(
         []string{
@@ -33,7 +34,8 @@ func init() {
         },
         "",
     )
-    cli.TabWidth = 4
+    cli.MaxWidth = 80 // Default
+    cli.TabWidth = 4 // Default
     cli.Bool(
         &abool,
         "a",

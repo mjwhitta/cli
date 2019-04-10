@@ -33,9 +33,11 @@ var auint uint64
 
 func init() {
     // Configure cli package
+    cli.Align = true
     cli.Banner = fmt.Sprintf("Usage: %s [OPTIONS] <arg>", os.Args[0])
     cli.Info = "A sample usage for the cli package"
-    cli.TabWidth = 4 // default
+    cli.MaxWidth = 80 // Default
+    cli.TabWidth = 4 // Default
 
     // Parse cli args
     cli.Bool(&abool, "b", "bool", false, "Example for bool flag")
@@ -81,6 +83,18 @@ func main() {
     fmt.Printf("%d %s\n", cli.NArg(), cli.Args())
 }
 ```
+
+### Configuring
+
+Export       | Default               | Description
+------       | -------               | -----------
+cli.Align    | false                 | Aligned the columns
+cli.Banner   | "Usage: $0 [OPTIONS]" | The usage example
+cli.Info     | ""                    | The description of the tool
+cli.MaxWidth | 80                    | Maximum width of usage
+cli.TabWidth | 4                     | The number of spaces between columns
+
+### Functions
 
 The following methods can be used to create flags:
 
