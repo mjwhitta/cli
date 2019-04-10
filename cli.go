@@ -9,7 +9,7 @@ import (
     "strings"
 )
 
-const Version = "1.1.0"
+const Version = "1.1.1"
 
 // Float64ListVar allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -135,14 +135,18 @@ func Args() []string {
 }
 
 func Bool(p *bool, s string, l string, v bool, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     flags = append(flags, flagVar{s, l, u})
     if (len(s) > 0) {flag.BoolVar(p, s, v, u)}
     if (len(l) > 0) {flag.BoolVar(p, l, v, u)}
     updateMaxWidth(s, l)
 }
 
-func checkFlags(s string, l string, u string) {
+func checkFlags(
+    s string,
+    l string,
+    u string,
+) (string, string, string) {
     var err = false
 
     if ((len(s) == 0) && (len(l) == 0)) {
@@ -168,6 +172,10 @@ func checkFlags(s string, l string, u string) {
     }
 
     if (err) {os.Exit(128)}
+
+    return strings.TrimSpace(s),
+           strings.TrimSpace(l),
+           strings.TrimSpace(u)
 }
 
 func flagToString(flag flagVar) string {
@@ -225,7 +233,7 @@ func flagToString(flag flagVar) string {
 }
 
 func Float64(p *float64, s string, l string, v float64, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=FLOAT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Float64Var(p, s, v, u)}
@@ -234,7 +242,7 @@ func Float64(p *float64, s string, l string, v float64, u string) {
 }
 
 func Float64List(p *Float64ListVar, s string, l string, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=FLOAT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
@@ -261,7 +269,7 @@ func getFlagColumn(s string, l string) string {
 }
 
 func Int(p *int, s string, l string, v int, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=INT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.IntVar(p, s, v, u)}
@@ -270,7 +278,7 @@ func Int(p *int, s string, l string, v int, u string) {
 }
 
 func Int64(p *int64, s string, l string, v int64, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=INT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Int64Var(p, s, v, u)}
@@ -279,7 +287,7 @@ func Int64(p *int64, s string, l string, v int64, u string) {
 }
 
 func Int64List(p *Int64ListVar, s string, l string, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=INT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
@@ -288,7 +296,7 @@ func Int64List(p *Int64ListVar, s string, l string, u string) {
 }
 
 func IntList(p *IntListVar, s string, l string, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=INT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
@@ -357,7 +365,7 @@ func PrintHeader() {
 }
 
 func String(p *string, s string, l string, v string, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=STRING", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.StringVar(p, s, v, u)}
@@ -366,7 +374,7 @@ func String(p *string, s string, l string, v string, u string) {
 }
 
 func StringList(p *StringListVar, s string, l string, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=STRING", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
@@ -375,7 +383,7 @@ func StringList(p *StringListVar, s string, l string, u string) {
 }
 
 func Uint(p *uint, s string, l string, v uint, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=UINT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.UintVar(p, s, v, u)}
@@ -384,7 +392,7 @@ func Uint(p *uint, s string, l string, v uint, u string) {
 }
 
 func Uint64(p *uint64, s string, l string, v uint64, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=UINT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Uint64Var(p, s, v, u)}
@@ -393,7 +401,7 @@ func Uint64(p *uint64, s string, l string, v uint64, u string) {
 }
 
 func Uint64List(p *Uint64ListVar, s string, l string, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=UINT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
@@ -402,7 +410,7 @@ func Uint64List(p *Uint64ListVar, s string, l string, u string) {
 }
 
 func UintList(p *UintListVar, s string, l string, u string) {
-    checkFlags(s, l, u)
+    s, l, u = checkFlags(s, l, u)
     var long = fmt.Sprintf("%s=UINT", l)
     flags = append(flags, flagVar{s, long, u})
     if (len(s) > 0) {flag.Var(p, s, u)}
