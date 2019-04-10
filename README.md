@@ -53,7 +53,7 @@ func init() {
     )
     cli.StringList(
         &astringlist,
-        "sl",
+        "l",
         "stringlist",
         "Example for []string flag",
     )
@@ -102,5 +102,9 @@ Other functions that simply wrap the `flag` package include:
 - `Parse()`
 - `Parsed()`
 - `PrintDefaults()`
+
+Additional functions include:
+
+- `PrintHeader()`
 
 And finally to print the usage message use `Usage(status int)`
