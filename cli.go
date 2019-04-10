@@ -4,6 +4,7 @@ import (
     "flag"
     "fmt"
     "os"
+    "sort"
     "strconv"
     "strings"
 )
@@ -308,6 +309,20 @@ func Parsed() bool {
 }
 
 func PrintDefaults() {
+    var less = func (i, j int) bool {
+        var left = flags[i].long
+        if (len(left) == 0) {left = flags[i].short}
+
+        var right = flags[j].long
+        if (len(right) == 0) {right = flags[j].short}
+
+        return (strings.ToLower(left) < strings.ToLower(right))
+    }
+
+    if (!sort.SliceIsSorted(flags, less)) {
+        sort.SliceStable(flags, less)
+    }
+
     for i := range(flags) {
         fmt.Fprint(os.Stderr, flagToString(flags[i]))
     }
