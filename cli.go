@@ -184,6 +184,9 @@ func flagToString(flag flagVar) string {
         var lines = wrap(flag.desc, 72 - maxWidth)
         for j := range(lines) {
             if (j > 0) {
+                // Leading space
+                str.WriteString("    ")
+
                 // Filler
                 for k := 0; k < maxWidth; k++ {
                     str.WriteString(" ")
@@ -203,7 +206,7 @@ func flagToString(flag flagVar) string {
 
         var lines = wrap(flag.desc, 72)
         for j := range(lines) {
-            // Filler
+            // Leading space
             str.WriteString("        ")
 
             // Actual description
