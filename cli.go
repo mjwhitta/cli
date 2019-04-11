@@ -10,7 +10,7 @@ import (
     "strings"
 )
 
-const Version = "1.3.1"
+const Version = "1.3.2"
 
 // Float64ListVar allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -130,6 +130,7 @@ var MaxWidth = 80
 var TabWidth = 4
 
 func init() {
+    flag.Usage = func () {Usage(127)}
     Bool(&help, "h", "help", false, "Display this help message")
 }
 
