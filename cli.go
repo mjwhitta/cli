@@ -10,7 +10,7 @@ import (
     "strings"
 )
 
-const Version = "1.3.2"
+const Version = "1.3.3"
 
 // Float64ListVar allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -379,11 +379,18 @@ func Parsed() bool {
 
 func PrintDefaults() {
     var less = func (i, j int) bool {
+        // Sort by short flag
         var left = flags[i].short
         if (len(left) == 0) {left = flags[i].long}
 
         var right = flags[j].short
         if (len(right) == 0) {right = flags[j].long}
+
+        // Fallback to long flag if comparing same short flag
+        if (strings.ToLower(left) == strings.ToLower(right)) {
+            if (len(flags[i].long) != 0) {left = flags[i].long}
+            if (len(flags[j].long) != 0) {right = flags[j].long}
+        }
 
         return (strings.ToLower(left) < strings.ToLower(right))
     }
