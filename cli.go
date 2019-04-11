@@ -10,7 +10,7 @@ import (
     "strings"
 )
 
-const Version = "1.3.0"
+const Version = "1.3.1"
 
 // Float64ListVar allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -231,10 +231,10 @@ func flagToString(f flagVar) string {
         // New line b/c colWidth.left is too big
         str.WriteString("\n")
 
-        var lines = wrap(f.desc, MaxWidth - 6 - TabWidth)
+        var lines = wrap(f.desc, MaxWidth - (2 * TabWidth))
         for i := range(lines) {
             // Leading space plus filler
-            for j := 0; j < (TabWidth + 6); j++ {
+            for j := 0; j < (2 * TabWidth); j++ {
                 str.WriteString(" ")
             }
 

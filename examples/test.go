@@ -16,7 +16,7 @@ var astringlist cli.StringListVar
 var auint uint64
 
 func init() {
-    // Parse cli args
+    // Configure cli package
     cli.Align = false // Default
     cli.Banner = fmt.Sprintf("Usage: %s [OPTIONS] <arg>", os.Args[0])
     cli.Info = strings.Join(
@@ -36,6 +36,8 @@ func init() {
     )
     cli.MaxWidth = 80 // Default
     cli.TabWidth = 4 // Default
+
+    // Parse cli args
     cli.Bool(
         &abool,
         "a",
