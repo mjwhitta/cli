@@ -19,7 +19,16 @@ var auint uint64
 func init() {
 	// Configure cli package
 	cli.Align = false // Default
-	cli.Banner = fmt.Sprintf("Usage: %s [OPTIONS] <arg>", os.Args[0])
+	cli.Authors = []string{"Miles W <mjwhitta@some.domain>"}
+	cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
+	cli.BugEmail = "bugs@some.domain"
+	cli.ExitStatus = strings.Join(
+		[]string{
+			"Normally the exit status is 0. In the event of invalid",
+			"or missing arguments, the exit status will be non-zero.",
+		},
+		" ",
+	)
 	cli.Info = strings.Join(
 		[]string{
 			"Lorem ipsum dolor sit amet, consectetur adipiscing",
@@ -36,7 +45,11 @@ func init() {
 		"",
 	)
 	cli.MaxWidth = 80 // Default
-	cli.TabWidth = 4  // Default
+	cli.SeeAlso = []string{
+		"flag",
+	}
+	cli.TabWidth = 4 // Default
+	cli.Title = "Sample README.md"
 
 	// Parse cli flags
 	cli.Flag(

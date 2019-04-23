@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const Version = "1.4.0"
+const Version = "1.5.0"
 
 // Float64List allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -133,17 +133,48 @@ type flagVar struct {
 }
 
 var Align = false
-var Banner = fmt.Sprintf("Usage: %s [OPTIONS]", os.Args[0])
+var Authors []string
+var Banner = fmt.Sprintf("%s [OPTIONS]", os.Args[0])
+var BugEmail string
 var colWidth = columnWidth{0, 0, math.MaxInt64, 0}
+var ExitStatus string
 var flags []flagVar
 var help bool
 var Info = ""
+var less = func(i, j int) bool {
+	// Sort by short flag
+	var left = flags[i].short
+	if len(left) == 0 {
+		left = flags[i].long
+	}
+
+	var right = flags[j].short
+	if len(right) == 0 {
+		right = flags[j].long
+	}
+
+	// Fallback to long flag if comparing same short flag
+	if strings.ToLower(left) == strings.ToLower(right) {
+		if len(flags[i].long) != 0 {
+			left = flags[i].long
+		}
+		if len(flags[j].long) != 0 {
+			right = flags[j].long
+		}
+	}
+
+	return (strings.ToLower(left) < strings.ToLower(right))
+}
 var MaxWidth = 80
+var readme bool
+var SeeAlso []string
 var TabWidth = 4
+var Title string
 
 func init() {
 	flag.Usage = func() { Usage(127) }
-	Flag(&help, "h", "help", false, "Display this help message")
+	Flag(&help, "h", "help", false, "Display this help message.")
+	Flag(&readme, "readme", false, "Autogenerate a README.md file.")
 }
 
 func Arg(i int) string {
@@ -449,6 +480,44 @@ func flagToString(f flagVar) string {
 	return str.String()
 }
 
+func flagToTable(f flagVar) string {
+	var str strings.Builder
+
+	// Option
+	if len(f.short) > 0 {
+		str.WriteString("`-")
+		str.WriteString(f.short)
+		str.WriteString("`")
+	}
+	if (len(f.short) > 0) && (len(f.long) > 0) {
+		str.WriteString(", ")
+	}
+	if len(f.long) > 0 {
+		str.WriteString("`--")
+		str.WriteString(f.long)
+		str.WriteString("`")
+	}
+
+	// Separator
+	str.WriteString(" | ")
+
+	// Args
+	if len(f.thetype) > 0 {
+		str.WriteString("`")
+		str.WriteString(f.thetype)
+		str.WriteString("`")
+	}
+
+	// Separator
+	str.WriteString(" | ")
+
+	// Description
+	str.WriteString(f.desc)
+
+	str.WriteString("\n")
+	return str.String()
+}
+
 func getFlagColumn(f flagVar, align bool) string {
 	var fillto int
 	var sep string
@@ -507,6 +576,9 @@ func Parse() {
 	if help {
 		Usage(0)
 	}
+	if readme {
+		Readme()
+	}
 }
 
 func Parsed() bool {
@@ -514,31 +586,6 @@ func Parsed() bool {
 }
 
 func PrintDefaults() {
-	var less = func(i, j int) bool {
-		// Sort by short flag
-		var left = flags[i].short
-		if len(left) == 0 {
-			left = flags[i].long
-		}
-
-		var right = flags[j].short
-		if len(right) == 0 {
-			right = flags[j].long
-		}
-
-		// Fallback to long flag if comparing same short flag
-		if strings.ToLower(left) == strings.ToLower(right) {
-			if len(flags[i].long) != 0 {
-				left = flags[i].long
-			}
-			if len(flags[j].long) != 0 {
-				right = flags[j].long
-			}
-		}
-
-		return (strings.ToLower(left) < strings.ToLower(right))
-	}
-
 	if !sort.SliceIsSorted(flags, less) {
 		sort.SliceStable(flags, less)
 	}
@@ -551,7 +598,7 @@ func PrintDefaults() {
 func PrintHeader() {
 	var header strings.Builder
 
-	var banner = wrap(Banner, MaxWidth)
+	var banner = wrap("Usage: "+Banner, MaxWidth)
 	for i := range banner {
 		header.WriteString(banner[i])
 		header.WriteString("\n")
@@ -571,6 +618,97 @@ func PrintHeader() {
 	header.WriteString("\nOPTIONS\n")
 
 	fmt.Fprint(os.Stderr, header.String())
+}
+
+func Readme() {
+	var readme strings.Builder
+
+	// Title
+	readme.WriteString("# ")
+	readme.WriteString(Title)
+	readme.WriteString("\n")
+
+	// Synopsis
+	readme.WriteString("\n## Synopsis\n\n")
+	var banner = wrap(Banner, MaxWidth)
+	for i := range banner {
+		readme.WriteString("`")
+		readme.WriteString(banner[i])
+		readme.WriteString("`")
+		readme.WriteString("\n")
+	}
+
+	// Description
+	readme.WriteString("\n## Description\n\n")
+	var info = wrap(Info, MaxWidth)
+	for i := range info {
+		readme.WriteString(info[i])
+		readme.WriteString("\n")
+	}
+
+	// Options and descriptions
+	readme.WriteString("\n## Options\n\n")
+	if !sort.SliceIsSorted(flags, less) {
+		sort.SliceStable(flags, less)
+	}
+	readme.WriteString("Option | Args | Description\n")
+	readme.WriteString("------ | ---- | -----------\n")
+	for i := range flags {
+		readme.WriteString(flagToTable(flags[i]))
+	}
+
+	// Author info
+	if len(Authors) > 0 {
+		readme.WriteString("\n## Authors\n\n")
+		for i := range Authors {
+			readme.WriteString(Authors[i])
+			readme.WriteString("\n")
+		}
+	}
+
+	// Info for reporting bugs
+	if len(BugEmail) > 0 {
+		var bugs = wrap(
+			strings.Join(
+				[]string{
+					"Email bug reports to the bug-reporting address ",
+					"(",
+					BugEmail,
+					").",
+				},
+				"",
+			),
+			MaxWidth,
+		)
+
+		readme.WriteString("\n## Reporting bugs\n\n")
+		for i := range bugs {
+			readme.WriteString(bugs[i])
+			readme.WriteString("\n")
+		}
+	}
+
+	// Exit status info
+	if len(ExitStatus) > 0 {
+		readme.WriteString("\n## Exit status\n\n")
+		var exitStatus = wrap(ExitStatus, MaxWidth)
+		for i := range exitStatus {
+			readme.WriteString(exitStatus[i])
+			readme.WriteString("\n")
+		}
+	}
+
+	// See also for more info
+	if len(SeeAlso) > 0 {
+		readme.WriteString("\n## See also\n\n")
+		for i := range SeeAlso {
+			readme.WriteString(SeeAlso[i])
+			readme.WriteString("\n")
+		}
+	}
+
+	fmt.Print(readme.String())
+	os.Exit(0)
 }
 
 func updateMaxWidth(f flagVar) {

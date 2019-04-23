@@ -38,9 +38,9 @@ func init() {
     cli.TabWidth = 4 // Default
 
     // Parse cli flags
-    cli.Flag(&abool, "bool", false, "Example for bool flag")
-    cli.Flag(&aint, "i", "int", 0, "Example for int flag")
-    cli.Flag(&astring, "string", "value", "Example for string flag")
+    cli.Flag(&abool, "bool", false, "Example for bool flag.")
+    cli.Flag(&aint, "i", "int", 0, "Example for int flag.")
+    cli.Flag(&astring, "string", "value", "Example for string flag.")
     cli.Parse()
 
     // Validate cli args
@@ -64,10 +64,14 @@ func main() {
 Export         | Default               | Description
 ------         | -------               | -----------
 `cli.Align`    | false                 | Aligned the columns
+`cli.Authors`  | [""]                  | List of authors
 `cli.Banner`   | "Usage: $0 [OPTIONS]" | The usage example
+`cli.BugEmail` | ""                    | Email for reporting bugs
 `cli.Info`     | ""                    | The description of the tool
 `cli.MaxWidth` | 80                    | Maximum width of usage
+`cli.SeeAlso`  | [""]                  | List of other packages for more info
 `cli.TabWidth` | 4                     | The number of spaces between columns
+`cli.Title`    | ""                    | Title for generated README.md
 
 ### Functions
 
@@ -88,5 +92,6 @@ Other functions that simply wrap the `flag` package include:
 Additional functions include:
 
 - `PrintHeader()`
+- `Readme()`
 
 And finally to print the usage message use `Usage(status int)`
