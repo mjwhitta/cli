@@ -19,6 +19,7 @@ var auint uint64
 func init() {
 	// Configure cli package
 	cli.Align = false // Default
+	// cli.Align = true
 	cli.Authors = []string{"Miles W <mjwhitta@some.domain>"}
 	cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
 	cli.BugEmail = "bugs@some.domain"

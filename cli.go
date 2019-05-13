@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const Version = "1.5.0"
+const Version = "1.5.1"
 
 // Float64List allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -423,22 +423,22 @@ func flagToString(f flagVar) string {
 	var enoughRoom = ((TabWidth + colWidth.left) <= (MaxWidth / 2))
 	var fillto int
 	var lines []string
-	var str strings.Builder
+	var str string
 
 	// Leading space
 	for i := 0; i < TabWidth; i++ {
-		str.WriteString(" ")
+		str += " "
 	}
 
 	// Flags
-	str.WriteString(getFlagColumn(f, Align && enoughRoom))
+	str += getFlagColumn(f, Align && enoughRoom)
 
 	// Description
 	if Align && enoughRoom {
 		// Filler
-		fillto = TabWidth + colWidth.left - str.Len()
+		fillto = TabWidth + colWidth.left - len(str)
 		for i := 0; i < fillto; i++ {
-			str.WriteString(" ")
+			str += " "
 		}
 
 		lines = wrap(f.desc, colWidth.desc)
@@ -446,90 +446,79 @@ func flagToString(f flagVar) string {
 			if i > 0 {
 				// Leading space plus filler
 				for j := 0; j < (TabWidth + colWidth.left); j++ {
-					str.WriteString(" ")
+					str += " "
 				}
 			}
 
 			// Alignment
 			for j := 0; j < TabWidth; j++ {
-				str.WriteString(" ")
+				str += " "
 			}
 
 			// Actual description
-			str.WriteString(lines[i])
-			str.WriteString("\n")
+			str += lines[i] + "\n"
 		}
 	} else {
 		// New line b/c colWidth.left is too big
-		str.WriteString("\n")
+		str += "\n"
 
 		lines = wrap(f.desc, MaxWidth-(2*TabWidth))
 		for i := range lines {
 			// Leading space plus filler
 			for j := 0; j < (2 * TabWidth); j++ {
-				str.WriteString(" ")
+				str += " "
 			}
 
 			// Actual description
-			str.WriteString(lines[i])
-			str.WriteString("\n")
+			str += lines[i] + "\n"
 		}
-		str.WriteString("\n")
+		str += "\n"
 	}
 
-	return str.String()
+	return str
 }
 
 func flagToTable(f flagVar) string {
-	var str strings.Builder
+	var str string
 
 	// Option
 	if len(f.short) > 0 {
-		str.WriteString("`-")
-		str.WriteString(f.short)
-		str.WriteString("`")
+		str += "`-" + f.short + "`"
 	}
 	if (len(f.short) > 0) && (len(f.long) > 0) {
-		str.WriteString(", ")
+		str += ", "
 	}
 	if len(f.long) > 0 {
-		str.WriteString("`--")
-		str.WriteString(f.long)
-		str.WriteString("`")
+		str += "`--" + f.long + "`"
 	}
 
 	// Separator
-	str.WriteString(" | ")
+	str += " | "
 
 	// Args
 	if len(f.thetype) > 0 {
-		str.WriteString("`")
-		str.WriteString(f.thetype)
-		str.WriteString("`")
+		str += "`" + f.thetype + "`"
 	}
 
 	// Separator
-	str.WriteString(" | ")
+	str += " | "
 
 	// Description
-	str.WriteString(f.desc)
+	str += f.desc + "\n"
 
-	str.WriteString("\n")
-	return str.String()
+	return str
 }
 
 func getFlagColumn(f flagVar, align bool) string {
 	var fillto int
 	var sep string
-	var str strings.Builder
+	var str string
 
 	// Short flag
 	if len(f.short) > 0 {
-		str.WriteString("-")
-		str.WriteString(f.short)
+		str += "-" + f.short
 		if len(f.thetype) > 0 {
-			str.WriteString(" ")
-			str.WriteString(f.thetype)
+			str += " " + f.thetype
 		}
 	}
 
@@ -539,28 +528,26 @@ func getFlagColumn(f flagVar, align bool) string {
 		sep = ", "
 	}
 	if len(f.short) > 0 {
-		str.WriteString(sep)
+		str += sep
 	}
 
 	// Alignment
 	if align {
-		fillto = colWidth.short + len(sep) - str.Len()
+		fillto = colWidth.short + len(sep) - len(str)
 		for i := 0; i < fillto; i++ {
-			str.WriteString(" ")
+			str += " "
 		}
 	}
 
 	// Long flag
 	if len(f.long) > 0 {
-		str.WriteString("--")
-		str.WriteString(f.long)
+		str += "--" + f.long
 		if len(f.thetype) > 0 {
-			str.WriteString("=")
-			str.WriteString(f.thetype)
+			str += "=" + f.thetype
 		}
 	}
 
-	return str.String()
+	return str
 }
 
 func NArg() int {
@@ -596,73 +583,64 @@ func PrintDefaults() {
 }
 
 func PrintHeader() {
-	var header strings.Builder
+	var header string
 
 	var banner = wrap("Usage: "+Banner, MaxWidth)
 	for i := range banner {
-		header.WriteString(banner[i])
-		header.WriteString("\n")
+		header += banner[i] + "\n"
 	}
 
-	header.WriteString("\nDESCRIPTION\n")
+	header += "\nDESCRIPTION\n"
 
 	var info = wrap(Info, MaxWidth-TabWidth)
 	for i := range info {
 		for j := 0; j < TabWidth; j++ {
-			header.WriteString(" ")
+			header += " "
 		}
-		header.WriteString(info[i])
-		header.WriteString("\n")
+		header += info[i] + "\n"
 	}
 
-	header.WriteString("\nOPTIONS\n")
+	header += "\nOPTIONS\n"
 
-	fmt.Fprint(os.Stderr, header.String())
+	fmt.Fprint(os.Stderr, header)
 }
 
 func Readme() {
-	var readme strings.Builder
+	var readme string
 
 	// Title
-	readme.WriteString("# ")
-	readme.WriteString(Title)
-	readme.WriteString("\n")
+	readme += "# " + Title + "\n"
 
 	// Synopsis
-	readme.WriteString("\n## Synopsis\n\n")
+	readme += "\n## Synopsis\n\n"
 	var banner = wrap(Banner, MaxWidth)
 	for i := range banner {
-		readme.WriteString("`")
-		readme.WriteString(banner[i])
-		readme.WriteString("`")
-		readme.WriteString("\n")
+		readme += "`" + banner[i] + "`\n"
 	}
 
 	// Description
-	readme.WriteString("\n## Description\n\n")
+	readme += "\n## Description\n\n"
 	var info = wrap(Info, MaxWidth)
 	for i := range info {
-		readme.WriteString(info[i])
-		readme.WriteString("\n")
+		readme += info[i] + "\n"
 	}
 
 	// Options and descriptions
-	readme.WriteString("\n## Options\n\n")
+	readme += "\n## Options\n\n"
 	if !sort.SliceIsSorted(flags, less) {
 		sort.SliceStable(flags, less)
 	}
-	readme.WriteString("Option | Args | Description\n")
-	readme.WriteString("------ | ---- | -----------\n")
+	readme += "Option | Args | Description\n"
+	readme += "------ | ---- | -----------\n"
 	for i := range flags {
-		readme.WriteString(flagToTable(flags[i]))
+		readme += flagToTable(flags[i])
 	}
 
 	// Author info
 	if len(Authors) > 0 {
-		readme.WriteString("\n## Authors\n\n")
+		readme += "\n## Authors\n\n"
 		for i := range Authors {
-			readme.WriteString(Authors[i])
-			readme.WriteString("\n")
+			readme += Authors[i] + "\n"
 		}
 	}
 
@@ -681,33 +659,30 @@ func Readme() {
 			MaxWidth,
 		)
 
-		readme.WriteString("\n## Reporting bugs\n\n")
+		readme += "\n## Reporting bugs\n\n"
 		for i := range bugs {
-			readme.WriteString(bugs[i])
-			readme.WriteString("\n")
+			readme += bugs[i] + "\n"
 		}
 	}
 
 	// Exit status info
 	if len(ExitStatus) > 0 {
-		readme.WriteString("\n## Exit status\n\n")
+		readme += "\n## Exit status\n\n"
 		var exitStatus = wrap(ExitStatus, MaxWidth)
 		for i := range exitStatus {
-			readme.WriteString(exitStatus[i])
-			readme.WriteString("\n")
+			readme += exitStatus[i] + "\n"
 		}
 	}
 
 	// See also for more info
 	if len(SeeAlso) > 0 {
-		readme.WriteString("\n## See also\n\n")
+		readme += "\n## See also\n\n"
 		for i := range SeeAlso {
-			readme.WriteString(SeeAlso[i])
-			readme.WriteString("\n")
+			readme += SeeAlso[i] + "\n"
 		}
 	}
 
-	fmt.Print(readme.String())
+	fmt.Print(readme)
 	os.Exit(0)
 }
 
@@ -752,25 +727,22 @@ func Usage(status int) {
 }
 
 func wrap(str string, cols int) []string {
-	var line strings.Builder
+	var line string
 	var lines []string
 	var words = strings.Fields(str)
 
 	for i := range words {
-		if line.Len()+len(words[i]) > cols {
-			lines = append(lines, line.String())
-			line.Reset()
-			line.WriteString(words[i])
-		} else if line.Len() == 0 {
-			line.Reset()
-			line.WriteString(words[i])
+		if len(line)+len(words[i]) > cols {
+			lines = append(lines, line)
+			line = words[i]
+		} else if len(line) == 0 {
+			line = words[i]
 		} else {
-			line.WriteString(" ")
-			line.WriteString(words[i])
+			line += " " + words[i]
 		}
 	}
-	if line.Len() > 0 {
-		lines = append(lines, line.String())
+	if len(line) > 0 {
+		lines = append(lines, line)
 	}
 
 	return lines
