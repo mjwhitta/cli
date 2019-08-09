@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const Version = "1.5.1"
+const Version = "1.6.0"
 
 // Float64List allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -174,6 +174,9 @@ var Title string
 func init() {
 	flag.Usage = func() { Usage(127) }
 	Flag(&help, "h", "help", false, "Display this help message.")
+}
+
+func AddReadmeFlag() {
 	Flag(&readme, "readme", false, "Autogenerate a README.md file.")
 }
 
