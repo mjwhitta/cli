@@ -21,6 +21,7 @@ package main
 import (
     "fmt"
     "os"
+    "strings"
 
     "gitlab.com/mjwhitta/cli"
 )
@@ -32,10 +33,21 @@ var astring string
 func init() {
     // Configure cli package
     cli.Align = true
+    cli.Authors = []string{"Some Person <someperson@some.domain>"}
     cli.Banner = fmt.Sprintf("Usage: %s [OPTIONS] <arg>", os.Args[0])
+    cli.BugEmail = "bugs@some.domain"
+    cli.ExitStatus = strings.Join(
+        []string{
+            "Normally the exit status is 0. In the event of invalid",
+            "or missing arguments, the exit status will be non-zero.",
+        },
+        " ",
+    )
     cli.Info = "A sample usage for the cli package"
     cli.MaxWidth = 80 // Default
+    cli.SeeAlso = []string{"some", "other", "tools"}
     cli.TabWidth = 4 // Default
+    cli.Title = "Some tool"
 
     // Parse cli flags
     cli.Flag(&abool, "bool", false, "Example for bool flag.")
@@ -61,17 +73,17 @@ func main() {
 
 ### Configuring
 
-Export         | Default               | Description
-------         | -------               | -----------
-`cli.Align`    | false                 | Aligned the columns
-`cli.Authors`  | [""]                  | List of authors
-`cli.Banner`   | "Usage: $0 [OPTIONS]" | The usage example
-`cli.BugEmail` | ""                    | Email for reporting bugs
-`cli.Info`     | ""                    | The description of the tool
-`cli.MaxWidth` | 80                    | Maximum width of usage
-`cli.SeeAlso`  | [""]                  | List of other packages for more info
-`cli.TabWidth` | 4                     | The number of spaces between columns
-`cli.Title`    | ""                    | Title for generated README.md
+Export                | Default               | Description
+------                | -------               | -----------
+`cli.Align`           | false                 | Aligned the columns
+`cli.Authors`         | [""]                  | List of authors
+`cli.Banner`          | "Usage: $0 [OPTIONS]" | The usage example
+`cli.BugEmail`        | ""                    | Email for reporting bugs
+`cli.Info`            | ""                    | The description of the tool
+`cli.MaxWidth`        | 80                    | Maximum width of usage
+`cli.SeeAlso`         | [""]                  | List of other packages for more info
+`cli.TabWidth`        | 4                     | The number of spaces between columns
+`cli.Title`           | ""                    | Title for generated README.md
 
 ### Functions
 

@@ -18,7 +18,6 @@ var auint uint64
 
 func init() {
 	// Configure cli package
-    // cli.AddReadmeFlag() // Add a README flag
 	cli.Align = false // Defaults to false
 	cli.Authors = []string{"Miles W <mjwhitta@some.domain>"}
 	cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
@@ -46,9 +45,7 @@ func init() {
 		"",
 	)
 	cli.MaxWidth = 80 // Defaults to 80
-	cli.SeeAlso = []string{
-		"flag",
-	}
+	cli.SeeAlso = []string{"flag"}
 	cli.TabWidth = 4 // Defaults to 4
 	cli.Title = "Sample README.md"
 

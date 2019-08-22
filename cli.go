@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const Version = "1.6.0"
+const Version = "1.7.0"
 
 // Float64List allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -174,9 +174,6 @@ var Title string
 func init() {
 	flag.Usage = func() { Usage(127) }
 	Flag(&help, "h", "help", false, "Display this help message.")
-}
-
-func AddReadmeFlag() {
 	Flag(&readme, "readme", false, "Autogenerate a README.md file.")
 }
 
@@ -581,8 +578,74 @@ func PrintDefaults() {
 	}
 
 	for i := range flags {
-		fmt.Fprint(os.Stderr, flagToString(flags[i]))
+		if flags[i].long != "readme" {
+			fmt.Fprint(os.Stderr, flagToString(flags[i]))
+		}
 	}
+}
+
+func PrintExtra() {
+	var extra string
+
+	// Author info
+	if len(Authors) > 0 {
+		extra += "AUTHORS\n"
+		for i := range Authors {
+			for j := 0; j < TabWidth; j++ {
+				extra += " "
+			}
+			extra += Authors[i] + "\n"
+		}
+	}
+
+	// Info for reporting bugs
+	if len(BugEmail) > 0 {
+		var bugs = wrap(
+			strings.Join(
+				[]string{
+					"Email bug reports to the bug-reporting address ",
+					"(",
+					BugEmail,
+					").",
+				},
+				"",
+			),
+			MaxWidth-TabWidth,
+		)
+
+		extra += "\nBUG REPORTS\n"
+		for i := range bugs {
+			for j := 0; j < TabWidth; j++ {
+				extra += " "
+			}
+			extra += bugs[i] + "\n"
+		}
+	}
+
+	// Exit status info
+	if len(ExitStatus) > 0 {
+		extra += "\nEXIT STATUS\n"
+		var exitStatus = wrap(ExitStatus, MaxWidth-TabWidth)
+		for i := range exitStatus {
+			for j := 0; j < TabWidth; j++ {
+				extra += " "
+			}
+			extra += exitStatus[i] + "\n"
+		}
+	}
+
+	// See also for more info
+	if len(SeeAlso) > 0 {
+		extra += "\nSEE ALSO\n"
+		for i := range SeeAlso {
+			for j := 0; j < TabWidth; j++ {
+				extra += " "
+			}
+			extra += SeeAlso[i] + "\n"
+		}
+	}
+
+	fmt.Fprint(os.Stderr, extra)
 }
 
 func PrintHeader() {
@@ -636,7 +699,9 @@ func Readme() {
 	readme += "Option | Args | Description\n"
 	readme += "------ | ---- | -----------\n"
 	for i := range flags {
-		readme += flagToTable(flags[i])
+		if flags[i].long != "readme" {
+			readme += flagToTable(flags[i])
+		}
 	}
 
 	// Author info
@@ -726,6 +791,7 @@ func updateMaxWidth(f flagVar) {
 func Usage(status int) {
 	PrintHeader()
 	PrintDefaults()
+	PrintExtra()
 	os.Exit(status)
 }
 
