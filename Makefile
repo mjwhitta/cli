@@ -1,7 +1,7 @@
 all: fmt
 
 fmt:
-	go fmt .
+	go fmt . ./examples
 
-test:
+test: fmt
 	go run ./examples/test.go -h
