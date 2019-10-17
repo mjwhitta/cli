@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const Version = "1.7.0"
+const Version = "1.7.1"
 
 // Float64List allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -581,6 +581,9 @@ func PrintDefaults() {
 		if flags[i].long != "readme" {
 			fmt.Fprint(os.Stderr, flagToString(flags[i]))
 		}
+	}
+	if Align {
+		fmt.Fprint(os.Stderr, "\n")
 	}
 }
 

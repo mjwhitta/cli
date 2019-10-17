@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	// "cli"
-	"gitlab.com/mjwhitta/cli"
+	"cli"
+	// "gitlab.com/mjwhitta/cli"
 )
 
 var abool bool
@@ -19,9 +19,9 @@ var auint uint64
 func init() {
 	// Configure cli package
 	cli.Align = false // Defaults to false
-	cli.Authors = []string{"Miles W <mjwhitta@some.domain>"}
+	cli.Authors = []string{"Miles Whittaker <mj@whitta.dev>"}
 	cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
-	cli.BugEmail = "bugs@some.domain"
+	cli.BugEmail = "cli.bugs@whitta.dev"
 	cli.ExitStatus = strings.Join(
 		[]string{
 			"Normally the exit status is 0. In the event of invalid",
