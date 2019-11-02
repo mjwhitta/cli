@@ -3,14 +3,13 @@ package cli
 import (
 	"flag"
 	"fmt"
-	"math"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
 )
 
-const Version = "1.7.1"
+const Version = "1.7.2"
 
 // Float64List allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
@@ -136,7 +135,7 @@ var Align = false
 var Authors []string
 var Banner = fmt.Sprintf("%s [OPTIONS]", os.Args[0])
 var BugEmail string
-var colWidth = columnWidth{0, 0, math.MaxInt64, 0}
+var colWidth = columnWidth{0, 0, 1024, 0}
 var ExitStatus string
 var flags []flagVar
 var help bool
