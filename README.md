@@ -1,5 +1,7 @@
 # cli
 
+## What is this?
+
 A simple wrapper for golang's `flag` package.
 
 ## How to install
@@ -10,7 +12,7 @@ Open a terminal and run the following:
 $ go get -u gitlab.com/mjwhitta/cli
 ```
 
-## How to use
+## Usage
 
 See the [examples](examples) for in-depth usage. Below is a sample
 usage to create simple main package:
