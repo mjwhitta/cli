@@ -1,5 +1,11 @@
 package cli
 
+import (
+    "fmt"
+    "os"
+    "strings"
+)
+
 var Align = false
 var Authors []string
 var Banner = fmt.Sprintf("%s [OPTIONS]", os.Args[0])
