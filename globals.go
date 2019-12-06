@@ -45,4 +45,4 @@ var SeeAlso []string
 var TabWidth = 4
 var Title string
 
-const Version = "1.7.2"
+const Version = "1.7.3"
