@@ -1,7 +1,13 @@
-all: fmt
+all: build
 
-fmt:
-	go fmt . ./examples
+build: check fmt
+	@go build .
 
-test: fmt
-	go run ./examples/test.go -h
+check:
+	@which go >/dev/null 2>&1
+
+fmt: check
+	@go fmt .
+
+gen: check
+	@go generate

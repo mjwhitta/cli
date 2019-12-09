@@ -14,10 +14,12 @@ func init() {
 	Flag(&readme, "readme", false, "Autogenerate a README.md file.")
 }
 
+// Arg wraps flag.Arg(i int).
 func Arg(i int) string {
 	return flag.Arg(i)
 }
 
+// Args wraps flag.Args().
 func Args() []string {
 	return flag.Args()
 }
@@ -56,6 +58,17 @@ func chkFlags(s string, l string, u string) (string, string, string) {
 		strings.TrimSpace(u)
 }
 
+// Flag will process the provided values to create a cli flag. Below
+// are a few examples:
+//
+//    var short bool
+//    cli.Flag(&short, "s", false, "An example bool short flag")
+//
+//    var long string
+//    cli.Flag(&long, "long", "asdf", "An example string long flag")
+//
+//    var both int
+//    cli.Flag(&both, "b", "both", 0, "An example int flag")
 func Flag(args ...interface{}) {
 	var containsSpace, isString bool
 	var long string
@@ -387,14 +400,18 @@ func getFlagColumn(f flagVar, align bool) string {
 	return str
 }
 
+// NArg wraps flag.NArg().
 func NArg() int {
 	return flag.NArg()
 }
 
+// NFlag wraps flag.NFlag().
 func NFlag() int {
 	return flag.NFlag()
 }
 
+// Parse will run flag.Parse() and then check for the --help or
+// --readme flags.
 func Parse() {
 	flag.Parse()
 	if help {
@@ -405,10 +422,13 @@ func Parse() {
 	}
 }
 
+// Parsed wraps flag.Parsed().
 func Parsed() bool {
 	return flag.Parsed()
 }
 
+// PrintDefaults will print the configured flags for Usage(). It
+// ignores the --readme flag.
 func PrintDefaults() {
 	if !sort.SliceIsSorted(flags, less) {
 		sort.SliceStable(flags, less)
@@ -424,6 +444,7 @@ func PrintDefaults() {
 	}
 }
 
+// PrintExtra will print the Usage() extra details.
 func PrintExtra() {
 	var extra string
 
@@ -488,6 +509,7 @@ func PrintExtra() {
 	fmt.Fprint(os.Stderr, extra)
 }
 
+// PrintHeader will print the Usage() header.
 func PrintHeader() {
 	var header string
 
@@ -511,6 +533,8 @@ func PrintHeader() {
 	fmt.Fprint(os.Stderr, header)
 }
 
+// Readme will attempt to print out a basic README.md file based on
+// the provided details.
 func Readme() {
 	var readme string
 
@@ -628,6 +652,7 @@ func updateMaxWidth(f flagVar) {
 	colWidth.left = colWidth.short + 2 + colWidth.long
 }
 
+// Usage will essentially print a manpage.
 func Usage(status int) {
 	PrintHeader()
 	PrintDefaults()

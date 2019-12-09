@@ -1,20 +1,36 @@
 package cli
 
+//go:generate ./scripts/generate_go_funcs
+
 import (
-    "fmt"
-    "os"
-    "strings"
+	"fmt"
+	"os"
+	"strings"
 )
 
+// Align determines if short and long cli flags are aligned or not.
 var Align = false
+
+// Authors is the configured list of authors.
 var Authors []string
+
+// Banner is the initial Usage() line.
 var Banner = fmt.Sprintf("%s [OPTIONS]", os.Args[0])
+
+// BugEmail is the configured email to send bug reports to.
 var BugEmail string
+
 var colWidth = columnWidth{0, 0, 1024, 0}
+
+// ExitStatus is the description of program exit status.
 var ExitStatus string
+
 var flags []flagVar
 var help bool
+
+// Info is the description of how the program works.
 var Info = ""
+
 var less = func(i, j int) bool {
 	// Sort by short flag
 	var left = flags[i].short
@@ -39,10 +55,21 @@ var less = func(i, j int) bool {
 
 	return (strings.ToLower(left) < strings.ToLower(right))
 }
+
+// MaxWidth is how wide the Usage() message should be.
 var MaxWidth = 80
+
 var readme bool
+
+// SeeAlso is a list of related tools.
 var SeeAlso []string
+
+// TabWidth determines the indentation size.
 var TabWidth = 4
+
+// Title is the title for the README.md generated with the --readme
+// flag.
 var Title string
 
-const Version = "1.7.3"
+// Version is the package version
+const Version = "1.7.4"
