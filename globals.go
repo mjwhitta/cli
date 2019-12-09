@@ -71,5 +71,5 @@ var TabWidth = 4
 // flag.
 var Title string
 
-// Version is the package version
+// Version is the package version.
 const Version = "1.7.5"
