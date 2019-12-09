@@ -14,16 +14,6 @@ func init() {
 	Flag(&readme, "readme", false, "Autogenerate a README.md file.")
 }
 
-// Arg wraps flag.Arg(i int).
-func Arg(i int) string {
-	return flag.Arg(i)
-}
-
-// Args wraps flag.Args().
-func Args() []string {
-	return flag.Args()
-}
-
 func chkFlags(s string, l string, u string) (string, string, string) {
 	var err = false
 
@@ -400,16 +390,6 @@ func getFlagColumn(f flagVar, align bool) string {
 	return str
 }
 
-// NArg wraps flag.NArg().
-func NArg() int {
-	return flag.NArg()
-}
-
-// NFlag wraps flag.NFlag().
-func NFlag() int {
-	return flag.NFlag()
-}
-
 // Parse will run flag.Parse() and then check for the --help or
 // --readme flags.
 func Parse() {
@@ -420,11 +400,6 @@ func Parse() {
 	if readme {
 		Readme()
 	}
-}
-
-// Parsed wraps flag.Parsed().
-func Parsed() bool {
-	return flag.Parsed()
 }
 
 // PrintDefaults will print the configured flags for Usage(). It
