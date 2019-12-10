@@ -6,20 +6,6 @@ import (
 	"strconv"
 )
 
-type columnWidth struct {
-	short int
-	long  int
-	desc  int
-	left  int
-}
-
-type flagVar struct {
-	short   string
-	long    string
-	desc    string
-	thetype string
-}
-
 // Float64List allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
 type Float64List []float64

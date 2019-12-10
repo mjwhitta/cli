@@ -8,13 +8,27 @@ import (
 	"strings"
 )
 
-func init() {
-	flag.Usage = func() { Usage(127) }
-	Flag(&help, "h", "help", false, "Display this help message.")
-	Flag(&readme, "readme", false, "Autogenerate a README.md file.")
+type columnWidth struct {
+	desc  int
+	left  int
+	long  int
+	short int
 }
 
-func chkFlags(s string, l string, u string) (string, string, string) {
+type flagVar struct {
+	desc    string
+	hidden  bool
+	long    string
+	short   string
+	thetype string
+}
+
+type section struct {
+	text  string
+	title string
+}
+
+func chkFlags(s string, l string, d string) (string, string, string) {
 	var err = false
 
 	if (len(s) == 0) && (len(l) == 0) {
@@ -34,7 +48,7 @@ func chkFlags(s string, l string, u string) (string, string, string) {
 		err = true
 	}
 
-	if len(u) == 0 {
+	if len(d) == 0 {
 		fmt.Fprint(os.Stderr, "No description provided\n")
 		err = true
 	}
@@ -45,7 +59,7 @@ func chkFlags(s string, l string, u string) (string, string, string) {
 
 	return strings.TrimSpace(s),
 		strings.TrimSpace(l),
-		strings.TrimSpace(u)
+		strings.TrimSpace(d)
 }
 
 // Flag will process the provided values to create a cli flag. Below
@@ -63,7 +77,7 @@ func Flag(args ...interface{}) {
 	var containsSpace, isString bool
 	var long string
 	var ptr interface{}
-	var short, thetype, tmp, usage string
+	var desc, short, thetype, tmp string
 	var value interface{}
 
 	// Process args
@@ -98,7 +112,7 @@ func Flag(args ...interface{}) {
 			} else if isString && (value == nil) {
 				value = args[i]
 			} else {
-				usage = tmp
+				desc = tmp
 			}
 		default:
 			fmt.Print("Error!\n")
@@ -107,9 +121,15 @@ func Flag(args ...interface{}) {
 	}
 
 	// Validate flags
-	short, long, usage = chkFlags(short, long, usage)
+	short, long, desc = chkFlags(short, long, desc)
 
-	var f = flagVar{short, long, usage, thetype}
+	var f = flagVar{
+		desc:    desc,
+		hidden:  (long == "readme"),
+		long:    long,
+		short:   short,
+		thetype: thetype,
+	}
 	flags = append(flags, f)
 
 	switch ptr.(type) {
@@ -357,7 +377,7 @@ func getFlagColumn(f flagVar, align bool) string {
 	// Short flag
 	if len(f.short) > 0 {
 		str += "-" + f.short
-		if len(f.thetype) > 0 {
+		if (len(f.thetype) > 0) && (len(f.long) == 0) {
 			str += " " + f.thetype
 		}
 	}
@@ -390,6 +410,12 @@ func getFlagColumn(f flagVar, align bool) string {
 	return str
 }
 
+func init() {
+	flag.Usage = func() { Usage(127) }
+	Flag(&help, "h", "help", false, "Display this help message.")
+	Flag(&readme, "readme", false, "Autogenerate a README.md file.")
+}
+
 // Parse will run flag.Parse() and then check for the --help or
 // --readme flags.
 func Parse() {
@@ -403,14 +429,14 @@ func Parse() {
 }
 
 // PrintDefaults will print the configured flags for Usage(). It
-// ignores the --readme flag.
+// ignores --readme and other hidden flags.
 func PrintDefaults() {
 	if !sort.SliceIsSorted(flags, less) {
 		sort.SliceStable(flags, less)
 	}
 
 	for i := range flags {
-		if flags[i].long != "readme" {
+		if !flags[i].hidden {
 			fmt.Fprint(os.Stderr, flagToString(flags[i]))
 		}
 	}
@@ -422,6 +448,19 @@ func PrintDefaults() {
 // PrintExtra will print the Usage() extra details.
 func PrintExtra() {
 	var extra string
+
+	// Custom sections
+	for _, section := range sections {
+		extra += section.title + "\n"
+		var text = wrap(section.text, MaxWidth-TabWidth)
+		for i := range text {
+			for j := 0; j < TabWidth; j++ {
+				extra += " "
+			}
+			extra += text[i] + "\n"
+		}
+		extra += "\n"
+	}
 
 	// Author info
 	if len(Authors) > 0 {
@@ -538,7 +577,7 @@ func Readme() {
 	readme += "Option | Args | Description\n"
 	readme += "------ | ---- | -----------\n"
 	for i := range flags {
-		if flags[i].long != "readme" {
+		if !flags[i].hidden {
 			readme += flagToTable(flags[i])
 		}
 	}
@@ -593,12 +632,18 @@ func Readme() {
 	os.Exit(0)
 }
 
+// Section will add a new custom section with the specified title and
+// text.
+func Section(title string, text string) {
+	sections = append(sections, section{text: text, title: title})
+}
+
 func updateMaxWidth(f flagVar) {
 	var sw = 0
 	var lw = 0
 	var dw = MaxWidth
 
-	if len(f.short) > 0 {
+	if (len(f.short) > 0) && (len(f.long) == 0) {
 		sw = 2 + len(f.thetype)
 		if len(f.thetype) > 0 {
 			sw++
@@ -635,23 +680,34 @@ func Usage(status int) {
 	os.Exit(status)
 }
 
-func wrap(str string, cols int) []string {
-	var line string
+func wrap(input string, width int) []string {
 	var lines []string
-	var words = strings.Fields(str)
+	var strs = strings.Split(input, "\n")
 
-	for i := range words {
-		if len(line)+len(words[i]) > cols {
+	for _, str := range strs {
+		var line string
+		var words = strings.Fields(str)
+
+		for _, word := range words {
+			if len(line)+len(word) > width {
+				lines = append(lines, line)
+				line = word
+			} else if len(line) == 0 {
+				line = word
+			} else {
+				line += " " + word
+			}
+		}
+
+		if len(line) > 0 {
 			lines = append(lines, line)
-			line = words[i]
-		} else if len(line) == 0 {
-			line = words[i]
 		} else {
-			line += " " + words[i]
+			lines = append(lines, "")
 		}
 	}
-	if len(line) > 0 {
-		lines = append(lines, line)
+
+	if strings.HasSuffix(input, "\n") {
+		lines = append(lines, "")
 	}
 
 	return lines

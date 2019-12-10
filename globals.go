@@ -20,7 +20,12 @@ var Banner = fmt.Sprintf("%s [OPTIONS]", os.Args[0])
 // BugEmail is the configured email to send bug reports to.
 var BugEmail string
 
-var colWidth = columnWidth{0, 0, 1024, 0}
+var colWidth = columnWidth{
+	desc:  1024,
+	left:  0,
+	long:  0,
+	short: 0,
+}
 
 // ExitStatus is the description of program exit status.
 var ExitStatus string
@@ -60,6 +65,7 @@ var less = func(i, j int) bool {
 var MaxWidth = 80
 
 var readme bool
+var sections []section
 
 // SeeAlso is a list of related tools.
 var SeeAlso []string
@@ -72,4 +78,4 @@ var TabWidth = 4
 var Title string
 
 // Version is the package version.
-const Version = "1.7.5"
+const Version = "1.7.6"

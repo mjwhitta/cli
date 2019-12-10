@@ -49,7 +49,7 @@ func init() {
     cli.MaxWidth = 80 // Default
     cli.SeeAlso = []string{"some", "other", "tools"}
     cli.TabWidth = 4 // Default
-    cli.Title = "Some tool"
+    cli.Title = "Some tool" // Used for README.md title
 
     // Parse cli flags
     cli.Flag(&abool, "bool", false, "Example for bool flag.")
@@ -95,7 +95,8 @@ The following methods can be used to create flags:
 - `Flag(ptr *interface{}, short string, val interface{}, desc string)`
 - `Flag(ptr *interface{}, short string, long string, val interface{}, desc string)`
 
-Other functions that simply wrap the `flag` package include:
+You can use `Section(title string, text string)` to add new custom
+sections. Other functions that simply wrap the `flag` package include:
 
 - `NArg()`
 - `NFlag()`
@@ -105,6 +106,7 @@ Other functions that simply wrap the `flag` package include:
 
 Additional functions include:
 
+- `PrintExtra()`
 - `PrintHeader()`
 - `Readme()`
 

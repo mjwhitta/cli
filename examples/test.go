@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"gitlab.com/mjwhitta/cli"
+	"cli"
 )
 
 var abool bool
@@ -17,14 +17,20 @@ var auint uint64
 
 func init() {
 	// Configure cli package
-	cli.Align = false // Defaults to false
+	cli.Align = true // Defaults to false
 	cli.Authors = []string{"Miles Whittaker <mj@whitta.dev>"}
 	cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
 	cli.BugEmail = "cli.bugs@whitta.dev"
 	cli.ExitStatus = strings.Join(
 		[]string{
-			"Normally the exit status is 0. In the event of invalid",
-			"or missing arguments, the exit status will be non-zero.",
+			"Normally the exit status is 0. In the event of an error",
+			"the exit status will be one of the below:\n\n",
+			"  1: Invalid option\n",
+			"  2: Invalid argument\n",
+			"  3: Missing argument\n",
+			"  4: Extra arguments\n",
+			"  5: Exception\n",
+			"  6: Ambiguous argument",
 		},
 		" ",
 	)
@@ -34,16 +40,27 @@ func init() {
 			"elit. Mauris ut augue euismod, cursus nulla ut, semper",
 			"eros. Integer pulvinar a lectus sed pretium. Cras a",
 			"luctus odio, eget sagittis leo. Interdum et malesuada",
-			"fames ac ante ipsum primis in faucibus. Nunc lectus",
-			"metus, consectetur et tellus tempus, accumsan rhoncus",
-			"arcu. Ut velit dui, aliquet eget tellus eget, commodo",
-			"auctor enim. Duis blandit, metus vitae sagittis",
-			"vestibulum, diam nisl fermentum lorem, non convallis",
-			"enim urna rutrum mauris. Duis in scelerisque mauris.",
+			"fames ac ante ipsum primis in faucibus.",
 		},
-		"",
+		" ",
 	)
 	cli.MaxWidth = 80 // Defaults to 80
+	cli.Section(
+		"FAUCIBUS",
+		strings.Join(
+			[]string{
+				"Nunc lectus metus, consectetur et tellus tempus,",
+				"accumsan rhoncus arcu.\n\n",
+				"Ut velit dui, aliquet eget tellus eget, commodo",
+				"auctor enim.\n\n",
+				"Duis blandit, metus vitae sagittis vestibulum, diam",
+				"nisl fermentum lorem, non convallis enim urna",
+				"rutrum mauris.\n\n",
+				"Duis in scelerisque mauris.",
+			},
+			" ",
+		),
+	)
 	cli.SeeAlso = []string{"flag"}
 	cli.TabWidth = 4 // Defaults to 4
 	cli.Title = "Sample README.md"
@@ -129,9 +146,11 @@ func init() {
 
 	// Validate cli args
 	if cli.NArg() == 0 {
-		cli.Usage(1)
+		cli.Usage(3)
+	} else if cli.NArg() > 1 {
+		cli.Usage(4)
 	} else if len(astring) == 0 {
-		cli.Usage(2)
+		cli.Usage(1)
 	}
 }
 

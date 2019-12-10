@@ -47,10 +47,10 @@ EOL
 
 // String will convert ${type^}List to a string.
 func (list *${type^}List) String() string {
-	if len(*list) == 0 {
-		return ""
-	}
-	return fmt.Sprint(*list)
+    if len(*list) == 0 {
+        return ""
+    }
+    return fmt.Sprint(*list)
 }
 
 // Set will append a $type to a ${type^}List.
@@ -61,45 +61,45 @@ $(
 cat <<EOL
     var v $type
     v, _ = strconv.ParseFloat(val, 64)
-	(*list) = append(*list, v)
+    (*list) = append(*list, v)
 EOL
             ;;
         "int")
 cat <<EOL
     var v ${type}64
     v, _ = strconv.ParseInt(val, 0, 0)
-	(*list) = append(*list, v)
+    (*list) = append(*list, v)
 EOL
             ;;
         "int64")
 cat <<EOL
     var v $type
     v, _ = strconv.ParseInt(val, 0, 64)
-	(*list) = append(*list, v)
+    (*list) = append(*list, v)
 EOL
             ;;
         "string")
 cat <<EOL
-	(*list) = append(*list, val)
+    (*list) = append(*list, val)
 EOL
             ;;
         "uint")
 cat <<EOL
     var v ${type}64
     v, _ = strconv.ParseUint(val, 0, 0)
-	(*list) = append(*list, v)
+    (*list) = append(*list, v)
 EOL
             ;;
         "uint64")
 cat <<EOL
     var v $type
     v, _ = strconv.ParseUint(val, 0, 64)
-	(*list) = append(*list, v)
+    (*list) = append(*list, v)
 EOL
             ;;
     esac
 )
-	return nil
+    return nil
 }
 EOF
 }
@@ -149,23 +149,9 @@ cat >"$file" <<EOF
 package cli
 
 import (
-	"fmt"
-	"strconv"
+    "fmt"
+    "strconv"
 )
-
-type columnWidth struct {
-	short int
-	long  int
-	desc  int
-	left  int
-}
-
-type flagVar struct {
-	short   string
-	long    string
-	desc    string
-	thetype string
-}
 
 $(
     for type in float64 int int64 string uint uint64; do
