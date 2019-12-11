@@ -37,24 +37,25 @@ var help bool
 var Info = ""
 
 var less = func(i, j int) bool {
-	// Sort by short flag
-	var left = flags[i].short
+	// Sort by long flag
+	var left = flags[i].long
 	if len(left) == 0 {
-		left = flags[i].long
+		left = flags[i].short
 	}
 
-	var right = flags[j].short
+	var right = flags[j].long
 	if len(right) == 0 {
-		right = flags[j].long
+		right = flags[j].short
 	}
 
-	// Fallback to long flag if comparing same short flag
+	// Fallback to short flag if comparing same long flag (should not
+	// happen)
 	if strings.ToLower(left) == strings.ToLower(right) {
-		if len(flags[i].long) != 0 {
-			left = flags[i].long
+		if len(flags[i].short) != 0 {
+			left = flags[i].short
 		}
-		if len(flags[j].long) != 0 {
-			right = flags[j].long
+		if len(flags[j].short) != 0 {
+			right = flags[j].short
 		}
 	}
 
@@ -78,4 +79,4 @@ var TabWidth = 4
 var Title string
 
 // Version is the package version.
-const Version = "1.7.6"
+const Version = "1.7.7"

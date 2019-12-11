@@ -639,12 +639,12 @@ func Section(title string, text string) {
 }
 
 func updateMaxWidth(f flagVar) {
-	var sw = 0
+	var sw = 2
 	var lw = 0
 	var dw = MaxWidth
 
 	if (len(f.short) > 0) && (len(f.long) == 0) {
-		sw = 2 + len(f.thetype)
+		sw += len(f.thetype)
 		if len(f.thetype) > 0 {
 			sw++
 		}
@@ -689,7 +689,7 @@ func wrap(input string, width int) []string {
 		var words = strings.Fields(str)
 
 		for _, word := range words {
-			if len(line)+len(word) > width {
+			if len(line)+len(word)+1 > width {
 				lines = append(lines, line)
 				line = word
 			} else if len(line) == 0 {
