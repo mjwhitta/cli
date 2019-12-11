@@ -582,6 +582,15 @@ func Readme() {
 		}
 	}
 
+	// Custom sections
+	for _, section := range sections {
+		readme += "\n## " + section.title + "\n\n"
+		var text = wrap(section.text, MaxWidth)
+		for i := range text {
+			readme += text[i] + "\n"
+		}
+	}
+
 	// Author info
 	if len(Authors) > 0 {
 		readme += "\n## Authors\n\n"
