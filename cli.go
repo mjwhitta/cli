@@ -74,20 +74,25 @@ func chkFlags(s string, l string, d string) (string, string, string) {
 //    var both int
 //    cli.Flag(&both, "b", "both", 0, "An example int flag")
 func Flag(args ...interface{}) {
-	var containsSpace, isString bool
+	var containsSpace bool
+	var desc string
+	var f flagVar
+	var isString bool
 	var long string
 	var ptr interface{}
-	var desc, short, thetype, tmp string
+	var short string
+	var thetype string
+	var tmp string
 	var value interface{}
 
 	// Process args
-	for i := range args {
-		switch args[i].(type) {
+	for _, arg := range args {
+		switch arg.(type) {
 		case *bool, *float64, *int, *int64, *string, *uint, *uint64,
 			*Float64List, *IntList, *Int64List, *StringList,
 			*UintList, *Uint64List:
-			ptr = args[i]
-			switch args[i].(type) {
+			ptr = arg
+			switch arg.(type) {
 			case *float64, *Float64List:
 				thetype = "FLOAT"
 			case *int, *int64, *IntList, *Int64List:
@@ -101,16 +106,16 @@ func Flag(args ...interface{}) {
 				thetype = "UINT"
 			}
 		case bool, float64, int, int64, uint, uint64:
-			value = args[i]
+			value = arg
 		case string:
-			tmp = args[i].(string)
+			tmp = arg.(string)
 			containsSpace = strings.Contains(tmp, " ")
 			if (short == "") && (len(tmp) == 1) {
 				short = tmp
 			} else if (long == "") && !containsSpace {
 				long = tmp
 			} else if isString && (value == nil) {
-				value = args[i]
+				value = arg
 			} else {
 				desc = tmp
 			}
@@ -123,7 +128,7 @@ func Flag(args ...interface{}) {
 	// Validate flags
 	short, long, desc = chkFlags(short, long, desc)
 
-	var f = flagVar{
+	f = flagVar{
 		desc:    desc,
 		hidden:  (long == "readme"),
 		long:    long,
@@ -302,7 +307,7 @@ func flagToString(f flagVar) string {
 		}
 
 		lines = wrap(f.desc, colWidth.desc)
-		for i := range lines {
+		for i, line := range lines {
 			if i > 0 {
 				// Leading space plus filler
 				for j := 0; j < (TabWidth + colWidth.left); j++ {
@@ -316,21 +321,21 @@ func flagToString(f flagVar) string {
 			}
 
 			// Actual description
-			str += lines[i] + "\n"
+			str += line + "\n"
 		}
 	} else {
 		// New line b/c colWidth.left is too big
 		str += "\n"
 
 		lines = wrap(f.desc, MaxWidth-(2*TabWidth))
-		for i := range lines {
+		for _, line := range lines {
 			// Leading space plus filler
-			for j := 0; j < (2 * TabWidth); j++ {
+			for i := 0; i < (2 * TabWidth); i++ {
 				str += " "
 			}
 
 			// Actual description
-			str += lines[i] + "\n"
+			str += line + "\n"
 		}
 		str += "\n"
 	}
@@ -435,9 +440,9 @@ func PrintDefaults() {
 		sort.SliceStable(flags, less)
 	}
 
-	for i := range flags {
-		if !flags[i].hidden {
-			fmt.Fprint(os.Stderr, flagToString(flags[i]))
+	for _, f := range flags {
+		if !f.hidden {
+			fmt.Fprint(os.Stderr, flagToString(f))
 		}
 	}
 	if Align {
@@ -448,16 +453,17 @@ func PrintDefaults() {
 // PrintExtra will print the Usage() extra details.
 func PrintExtra() {
 	var extra string
+	var lines []string
 
 	// Custom sections
-	for _, section := range sections {
-		extra += section.title + "\n"
-		var text = wrap(section.text, MaxWidth-TabWidth)
-		for i := range text {
-			for j := 0; j < TabWidth; j++ {
+	for _, s := range sections {
+		extra += s.title + "\n"
+		lines = wrap(s.text, MaxWidth-TabWidth)
+		for _, line := range lines {
+			for i := 0; i < TabWidth; i++ {
 				extra += " "
 			}
-			extra += text[i] + "\n"
+			extra += line + "\n"
 		}
 		extra += "\n"
 	}
@@ -465,17 +471,17 @@ func PrintExtra() {
 	// Author info
 	if len(Authors) > 0 {
 		extra += "AUTHORS\n"
-		for i := range Authors {
-			for j := 0; j < TabWidth; j++ {
+		for _, author := range Authors {
+			for i := 0; i < TabWidth; i++ {
 				extra += " "
 			}
-			extra += Authors[i] + "\n"
+			extra += author + "\n"
 		}
 	}
 
 	// Info for reporting bugs
 	if len(BugEmail) > 0 {
-		var bugs = wrap(
+		lines = wrap(
 			strings.Join(
 				[]string{
 					"Email bug reports to the bug-reporting address ",
@@ -489,34 +495,34 @@ func PrintExtra() {
 		)
 
 		extra += "\nBUG REPORTS\n"
-		for i := range bugs {
-			for j := 0; j < TabWidth; j++ {
+		for _, line := range lines {
+			for i := 0; i < TabWidth; i++ {
 				extra += " "
 			}
-			extra += bugs[i] + "\n"
+			extra += line + "\n"
 		}
 	}
 
 	// Exit status info
 	if len(ExitStatus) > 0 {
 		extra += "\nEXIT STATUS\n"
-		var exitStatus = wrap(ExitStatus, MaxWidth-TabWidth)
-		for i := range exitStatus {
-			for j := 0; j < TabWidth; j++ {
+		lines = wrap(ExitStatus, MaxWidth-TabWidth)
+		for _, line := range lines {
+			for i := 0; i < TabWidth; i++ {
 				extra += " "
 			}
-			extra += exitStatus[i] + "\n"
+			extra += line + "\n"
 		}
 	}
 
 	// See also for more info
 	if len(SeeAlso) > 0 {
 		extra += "\nSEE ALSO\n"
-		for i := range SeeAlso {
-			for j := 0; j < TabWidth; j++ {
+		for _, see := range SeeAlso {
+			for i := 0; i < TabWidth; i++ {
 				extra += " "
 			}
-			extra += SeeAlso[i] + "\n"
+			extra += see + "\n"
 		}
 	}
 
@@ -526,20 +532,21 @@ func PrintExtra() {
 // PrintHeader will print the Usage() header.
 func PrintHeader() {
 	var header string
+	var lines []string
 
-	var banner = wrap("Usage: "+Banner, MaxWidth)
-	for i := range banner {
-		header += banner[i] + "\n"
+	lines = wrap("Usage: "+Banner, MaxWidth)
+	for _, line := range lines {
+		header += line + "\n"
 	}
 
 	header += "\nDESCRIPTION\n"
 
-	var info = wrap(Info, MaxWidth-TabWidth)
-	for i := range info {
+	lines = wrap(Info, MaxWidth-TabWidth)
+	for _, line := range lines {
 		for j := 0; j < TabWidth; j++ {
 			header += " "
 		}
-		header += info[i] + "\n"
+		header += line + "\n"
 	}
 
 	header += "\nOPTIONS\n"
@@ -550,6 +557,7 @@ func PrintHeader() {
 // Readme will attempt to print out a basic README.md file based on
 // the provided details.
 func Readme() {
+	var lines []string
 	var readme string
 
 	// Title
@@ -557,16 +565,16 @@ func Readme() {
 
 	// Synopsis
 	readme += "\n## Synopsis\n\n"
-	var banner = wrap(Banner, MaxWidth)
-	for i := range banner {
-		readme += "`" + banner[i] + "`\n"
+	lines = wrap(Banner, MaxWidth)
+	for _, line := range lines {
+		readme += "`" + line + "`\n"
 	}
 
 	// Description
 	readme += "\n## Description\n\n"
-	var info = wrap(Info, MaxWidth)
-	for i := range info {
-		readme += info[i] + "\n"
+	lines = wrap(Info, MaxWidth)
+	for _, line := range lines {
+		readme += line + "\n"
 	}
 
 	// Options and descriptions
@@ -576,32 +584,32 @@ func Readme() {
 	}
 	readme += "Option | Args | Description\n"
 	readme += "------ | ---- | -----------\n"
-	for i := range flags {
-		if !flags[i].hidden {
-			readme += flagToTable(flags[i])
+	for _, f := range flags {
+		if !f.hidden {
+			readme += flagToTable(f)
 		}
 	}
 
 	// Custom sections
-	for _, section := range sections {
-		readme += "\n## " + section.title + "\n\n"
-		var text = wrap(section.text, MaxWidth)
-		for i := range text {
-			readme += text[i] + "\n"
+	for _, s := range sections {
+		readme += "\n## " + s.title + "\n\n"
+		lines = wrap(s.text, MaxWidth)
+		for _, line := range lines {
+			readme += line + "\n"
 		}
 	}
 
 	// Author info
 	if len(Authors) > 0 {
 		readme += "\n## Authors\n\n"
-		for i := range Authors {
-			readme += Authors[i] + "\n"
+		for _, author := range Authors {
+			readme += author + "\n"
 		}
 	}
 
 	// Info for reporting bugs
 	if len(BugEmail) > 0 {
-		var bugs = wrap(
+		lines = wrap(
 			strings.Join(
 				[]string{
 					"Email bug reports to the bug-reporting address ",
@@ -615,25 +623,25 @@ func Readme() {
 		)
 
 		readme += "\n## Reporting bugs\n\n"
-		for i := range bugs {
-			readme += bugs[i] + "\n"
+		for _, line := range lines {
+			readme += line + "\n"
 		}
 	}
 
 	// Exit status info
 	if len(ExitStatus) > 0 {
 		readme += "\n## Exit status\n\n"
-		var exitStatus = wrap(ExitStatus, MaxWidth)
-		for i := range exitStatus {
-			readme += exitStatus[i] + "\n"
+		lines = wrap(ExitStatus, MaxWidth)
+		for _, line := range lines {
+			readme += line + "\n"
 		}
 	}
 
 	// See also for more info
 	if len(SeeAlso) > 0 {
 		readme += "\n## See also\n\n"
-		for i := range SeeAlso {
-			readme += SeeAlso[i] + "\n"
+		for _, see := range SeeAlso {
+			readme += see + "\n"
 		}
 	}
 
@@ -690,12 +698,14 @@ func Usage(status int) {
 }
 
 func wrap(input string, width int) []string {
+	var line string
 	var lines []string
 	var strs = strings.Split(input, "\n")
+	var words []string
 
 	for _, str := range strs {
-		var line string
-		var words = strings.Fields(str)
+		line = ""
+		words = strings.Fields(str)
 
 		for _, word := range words {
 			if len(line)+len(word)+1 > width {
