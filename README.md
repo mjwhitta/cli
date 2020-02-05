@@ -14,7 +14,7 @@ $ go get -u gitlab.com/mjwhitta/cli
 
 ## Usage
 
-See the [examples](examples) for in-depth usage. Below is a sample
+See the [example](cmd/example) for in-depth usage. Below is a sample
 usage to create simple main package:
 
 ```

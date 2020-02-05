@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"cli"
+	"gitlab.com/mjwhitta/cli"
 )
 
 var abool bool
