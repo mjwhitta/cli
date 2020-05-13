@@ -8,12 +8,15 @@ import (
 	"gitlab.com/mjwhitta/cli"
 )
 
-var abool bool
-var afloat float64
-var aint int64
-var astring string
-var astringlist cli.StringList
-var auint uint64
+var flags struct {
+	aBool       bool
+	aFloat      float64
+	aInt        int
+	anIntList   cli.IntList
+	aString     string
+	aStringList cli.StringList
+	aUint       uint
+}
 
 func init() {
 	// Configure cli package
@@ -29,8 +32,7 @@ func init() {
 			"  2: Invalid argument\n",
 			"  3: Missing argument\n",
 			"  4: Extra arguments\n",
-			"  5: Exception\n",
-			"  6: Ambiguous argument",
+			"  5: Exception",
 		},
 		" ",
 	)
@@ -46,7 +48,7 @@ func init() {
 	)
 	cli.MaxWidth = 80 // Defaults to 80
 	cli.Section(
-		"FAUCIBUS",
+		"CUSTOM SECTION EXAMPLE",
 		strings.Join(
 			[]string{
 				"Nunc lectus metus, consectetur et tellus tempus,",
@@ -66,82 +68,13 @@ func init() {
 	cli.Title = "Sample README.md"
 
 	// Parse cli flags
-	cli.Flag(
-		&abool,
-		"a",
-		"praesent",
-		// "praesentpraesentpraesent",
-		false,
-		strings.Join(
-			[]string{
-				"Fusce blandit nisi eu sem maximus, ut eleifend",
-				"lectus semper.",
-			},
-			" ",
-		),
-	)
-	cli.Flag(
-		&afloat,
-		"b",
-		"facilisis",
-		0.0,
-		strings.Join(
-			[]string{
-				"Cras ac dolor ante. Nulla posuere non purus ac",
-				"vehicula.",
-			},
-			" ",
-		),
-	)
-	cli.Flag(
-		&aint,
-		"c",
-		0,
-		strings.Join(
-			[]string{
-				"Nullam efficitur elit vel venenatis mattis. Aenean",
-				"viverra tincidunt ligula.",
-			},
-			" ",
-		),
-	)
-	cli.Flag(
-		&astring,
-		"d",
-		"ut",
-		"",
-		strings.Join(
-			[]string{
-				"Nulla a sollicitudin ex. Sed faucibus lacus congue",
-				"dapibus vestibulum.",
-			},
-			" ",
-		),
-	)
-	cli.Flag(
-		&astringlist,
-		"e",
-		"placerat",
-		strings.Join(
-			[]string{
-				"Etiam efficitur interdum leo nec luctus. Etiam est",
-				"erat, bibendum.",
-			},
-			" ",
-		),
-	)
-	cli.Flag(
-		&auint,
-		"sagittis",
-		0,
-		strings.Join(
-			[]string{
-				"Donec posuere efficitur massa, ut imperdiet mauris",
-				"sodales sit amet.",
-			},
-			" ",
-		),
-	)
+	cli.Flag(&flags.aBool, "b", "bool", false, "Sample boolean flag.")
+	cli.Flag(&flags.aFloat, "f", "float", 0.0, "Sample float flag.")
+	cli.Flag(&flags.aInt, "i", 0, "Sample", "int flag.")
+	cli.Flag(&flags.anIntList, "int", "Sample int list flag.")
+	cli.Flag(&flags.aString, "s", "", "Sample string flag.")
+	cli.Flag(&flags.aStringList, "string", "Sample string list flag.")
+	cli.Flag(&flags.aUint, "u", "uint", 0, "Sample uint flag.")
 	cli.Parse()
 
 	// Validate cli args
@@ -149,17 +82,28 @@ func init() {
 		cli.Usage(3)
 	} else if cli.NArg() > 1 {
 		cli.Usage(4)
-	} else if len(astring) == 0 {
+	} else if flags.aString == "" {
 		cli.Usage(1)
 	}
 }
 
 func main() {
-	fmt.Printf("%t\n", abool)
-	fmt.Printf("%f\n", afloat)
-	fmt.Printf("%d\n", aint)
-	fmt.Printf("%s\n", astring)
-	fmt.Printf("%d - %s\n", len(astringlist), astringlist)
-	fmt.Printf("%d\n", auint)
-	fmt.Printf("%d %s\n", cli.NArg(), cli.Args())
+	fmt.Printf("%t\n", flags.aBool)
+	fmt.Printf("%f\n", flags.aFloat)
+	fmt.Printf("%d\n", flags.aInt)
+	fmt.Printf("%d - %v\n", len(flags.anIntList), flags.anIntList)
+	fmt.Printf(
+		"%d - %s\n",
+		len(flags.anIntList),
+		flags.anIntList.String(),
+	)
+	fmt.Printf("%s\n", flags.aString)
+	fmt.Printf("%d - %v\n", len(flags.aStringList), flags.aStringList)
+	fmt.Printf(
+		"%d - %s\n",
+		len(flags.aStringList),
+		flags.aStringList.String(),
+	)
+	fmt.Printf("%d\n", flags.aUint)
+	fmt.Printf("%d - %s\n", cli.NArg(), cli.Args())
 }

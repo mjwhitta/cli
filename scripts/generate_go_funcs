@@ -32,7 +32,7 @@ generate_type_func() {
 // --flag=${flag}1 --flag=${flag}2
 $(
     case "$type" in
-        *"int")
+        "float"|*"int")
 cat <<EOL
 type ${type^}List []${type}64
 EOL
@@ -48,58 +48,37 @@ EOL
 // String will convert ${type^}List to a string.
 func (list *${type^}List) String() string {
     if len(*list) == 0 {
-        return ""
+        return "[]"
     }
     return fmt.Sprint(*list)
 }
 
 // Set will append a $type to a ${type^}List.
-func (list *${type^}List) Set(val string) error {
+func (list *${type^}List) Set(val string) (e error) {
 $(
     case "$type" in
-        "float64")
-cat <<EOL
-    var v $type
-    v, _ = strconv.ParseFloat(val, 64)
-    (*list) = append(*list, v)
-EOL
-            ;;
-        "int")
-cat <<EOL
+        "float")
+            cat <<EOL
     var v ${type}64
-    v, _ = strconv.ParseInt(val, 0, 0)
+    v, e = strconv.ParseFloat(val, 64)
     (*list) = append(*list, v)
 EOL
             ;;
-        "int64")
-cat <<EOL
-    var v $type
-    v, _ = strconv.ParseInt(val, 0, 64)
+        "int"|"uint")
+            cat <<EOL
+    var v ${type}64
+    v, _ = strconv.Parse${type^}(val, 0, 64)
     (*list) = append(*list, v)
 EOL
-            ;;
+        ;;
         "string")
-cat <<EOL
+            cat <<EOL
     (*list) = append(*list, val)
-EOL
-            ;;
-        "uint")
-cat <<EOL
-    var v ${type}64
-    v, _ = strconv.ParseUint(val, 0, 0)
-    (*list) = append(*list, v)
-EOL
-            ;;
-        "uint64")
-cat <<EOL
-    var v $type
-    v, _ = strconv.ParseUint(val, 0, 64)
-    (*list) = append(*list, v)
 EOL
             ;;
     esac
 )
-    return nil
+    return e
 }
 EOF
 }
@@ -154,7 +133,7 @@ import (
 )
 
 $(
-    for type in float64 int int64 string uint uint64; do
+    for type in float int string uint; do
         generate_type_func $type
     done; unset type
 )

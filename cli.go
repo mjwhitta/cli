@@ -15,51 +15,9 @@ type columnWidth struct {
 	short int
 }
 
-type flagVar struct {
-	desc    string
-	hidden  bool
-	long    string
-	short   string
-	thetype string
-}
-
 type section struct {
 	text  string
 	title string
-}
-
-func chkFlags(s string, l string, d string) (string, string, string) {
-	var err = false
-
-	if (len(s) == 0) && (len(l) == 0) {
-		fmt.Fprint(os.Stderr, "No flag provided\n")
-		err = true
-	}
-
-	if len(s) > 1 {
-		fmt.Fprint(os.Stderr, "Invalid short flag:\n")
-		fmt.Fprintf(os.Stderr, "  %s has length greater than 1\n", s)
-		err = true
-	}
-
-	if len(l) == 1 {
-		fmt.Fprint(os.Stderr, "Invalid long flag:\n")
-		fmt.Fprintf(os.Stderr, "  %s has length equal to 1\n", l)
-		err = true
-	}
-
-	if len(d) == 0 {
-		fmt.Fprint(os.Stderr, "No description provided\n")
-		err = true
-	}
-
-	if err {
-		os.Exit(128)
-	}
-
-	return strings.TrimSpace(s),
-		strings.TrimSpace(l),
-		strings.TrimSpace(d)
 }
 
 // Flag will process the provided values to create a cli flag. Below
@@ -74,217 +32,29 @@ func chkFlags(s string, l string, d string) (string, string, string) {
 //    var both int
 //    cli.Flag(&both, "b", "both", 0, "An example int flag")
 func Flag(args ...interface{}) {
-	var containsSpace bool
-	var desc string
-	var f flagVar
-	var isString bool
-	var long string
-	var ptr interface{}
-	var short string
-	var thetype string
-	var tmp string
-	var value interface{}
+	var e error
+	var f *cliFlag
 
-	// Process args
-	for _, arg := range args {
-		switch arg.(type) {
-		case *bool, *float64, *int, *int64, *string, *uint, *uint64,
-			*Float64List, *IntList, *Int64List, *StringList,
-			*UintList, *Uint64List:
-			ptr = arg
-			switch arg.(type) {
-			case *float64, *Float64List:
-				thetype = "FLOAT"
-			case *int, *int64, *IntList, *Int64List:
-				thetype = "INT"
-			case *string:
-				isString = true
-				thetype = "STRING"
-			case *StringList:
-				thetype = "STRING"
-			case *uint, *uint64, *UintList, *Uint64List:
-				thetype = "UINT"
-			}
-		case bool, float64, int, int64, uint, uint64:
-			value = arg
-		case string:
-			tmp = arg.(string)
-			containsSpace = strings.Contains(tmp, " ")
-			if (short == "") && (len(tmp) == 1) {
-				short = tmp
-			} else if (long == "") && !containsSpace {
-				long = tmp
-			} else if isString && (value == nil) {
-				value = arg
-			} else {
-				desc = tmp
-			}
-		default:
-			fmt.Print("Error!\n")
-			os.Exit(127)
-		}
+	if len(args) == 0 {
+		return
 	}
 
-	// Validate flags
-	short, long, desc = chkFlags(short, long, desc)
-
-	f = flagVar{
-		desc:    desc,
-		hidden:  (long == "readme"),
-		long:    long,
-		short:   short,
-		thetype: thetype,
+	if f, e = newFlag(args...); e != nil {
+		fmt.Fprintln(os.Stderr, e.Error())
+		os.Exit(127)
 	}
+
+	if e = f.validate(); e != nil {
+		fmt.Fprintln(os.Stderr, e.Error())
+		os.Exit(128)
+	}
+
 	flags = append(flags, f)
-
-	switch ptr.(type) {
-	case *bool:
-		if len(f.short) > 0 {
-			flag.BoolVar(ptr.(*bool), f.short, value.(bool), f.desc)
-		}
-		if len(f.long) > 0 {
-			flag.BoolVar(ptr.(*bool), f.long, value.(bool), f.desc)
-		}
-	case *float64:
-		if len(f.short) > 0 {
-			flag.Float64Var(
-				ptr.(*float64),
-				f.short,
-				value.(float64),
-				f.desc,
-			)
-		}
-		if len(f.long) > 0 {
-			flag.Float64Var(
-				ptr.(*float64),
-				f.long,
-				value.(float64),
-				f.desc,
-			)
-		}
-	case *Float64List:
-		if len(f.short) > 0 {
-			flag.Var(ptr.(*Float64List), f.short, f.desc)
-		}
-		if len(f.long) > 0 {
-			flag.Var(ptr.(*Float64List), f.long, f.desc)
-		}
-	case *int:
-		if len(f.short) > 0 {
-			flag.IntVar(ptr.(*int), f.short, value.(int), f.desc)
-		}
-		if len(f.long) > 0 {
-			flag.IntVar(ptr.(*int), f.long, value.(int), f.desc)
-		}
-	case *int64:
-		if len(f.short) > 0 {
-			flag.Int64Var(
-				ptr.(*int64),
-				f.short,
-				int64(value.(int)),
-				f.desc,
-			)
-		}
-		if len(f.long) > 0 {
-			flag.Int64Var(
-				ptr.(*int64),
-				f.long,
-				int64(value.(int)),
-				f.desc,
-			)
-		}
-	case *Int64List:
-		if len(f.short) > 0 {
-			flag.Var(ptr.(*Int64List), f.short, f.desc)
-		}
-		if len(f.long) > 0 {
-			flag.Var(ptr.(*Int64List), f.long, f.desc)
-		}
-	case *IntList:
-		if len(f.short) > 0 {
-			flag.Var(ptr.(*IntList), f.short, f.desc)
-		}
-		if len(f.long) > 0 {
-			flag.Var(ptr.(*IntList), f.long, f.desc)
-		}
-	case *string:
-		if len(f.short) > 0 {
-			flag.StringVar(
-				ptr.(*string),
-				f.short,
-				value.(string),
-				f.desc,
-			)
-		}
-		if len(f.long) > 0 {
-			flag.StringVar(
-				ptr.(*string),
-				f.long,
-				value.(string),
-				f.desc,
-			)
-		}
-	case *StringList:
-		if len(f.short) > 0 {
-			flag.Var(ptr.(*StringList), f.short, f.desc)
-		}
-		if len(f.long) > 0 {
-			flag.Var(ptr.(*StringList), f.long, f.desc)
-		}
-	case *uint:
-		if len(f.short) > 0 {
-			flag.UintVar(
-				ptr.(*uint),
-				f.short,
-				uint(value.(int)),
-				f.desc,
-			)
-		}
-		if len(f.long) > 0 {
-			flag.UintVar(
-				ptr.(*uint),
-				f.long,
-				uint(value.(int)),
-				f.desc,
-			)
-		}
-	case *uint64:
-		if len(f.short) > 0 {
-			flag.Uint64Var(
-				ptr.(*uint64),
-				f.short,
-				uint64(value.(int)),
-				f.desc,
-			)
-		}
-		if len(f.long) > 0 {
-			flag.Uint64Var(
-				ptr.(*uint64),
-				f.long,
-				uint64(value.(int)),
-				f.desc,
-			)
-		}
-	case *Uint64List:
-		if len(f.short) > 0 {
-			flag.Var(ptr.(*Uint64List), f.short, f.desc)
-		}
-		if len(f.long) > 0 {
-			flag.Var(ptr.(*Uint64List), f.long, f.desc)
-		}
-	case *UintList:
-		if len(f.short) > 0 {
-			flag.Var(ptr.(*UintList), f.short, f.desc)
-		}
-		if len(f.long) > 0 {
-			flag.Var(ptr.(*UintList), f.long, f.desc)
-		}
-	}
-
+	f.enable()
 	updateMaxWidth(f)
 }
 
-func flagToString(f flagVar) string {
+func flagToString(f *cliFlag) string {
 	var enoughRoom = ((TabWidth + colWidth.left) <= (MaxWidth / 2))
 	var fillto int
 	var lines []string
@@ -343,17 +113,17 @@ func flagToString(f flagVar) string {
 	return str
 }
 
-func flagToTable(f flagVar) string {
+func flagToTable(f *cliFlag) string {
 	var str string
 
 	// Option
-	if len(f.short) > 0 {
+	if f.short != "" {
 		str += "`-" + f.short + "`"
 	}
-	if (len(f.short) > 0) && (len(f.long) > 0) {
+	if (f.short != "") && (f.long != "") {
 		str += ", "
 	}
-	if len(f.long) > 0 {
+	if f.long != "" {
 		str += "`--" + f.long + "`"
 	}
 
@@ -361,7 +131,7 @@ func flagToTable(f flagVar) string {
 	str += " | "
 
 	// Args
-	if len(f.thetype) > 0 {
+	if f.thetype != "" {
 		str += "`" + f.thetype + "`"
 	}
 
@@ -374,25 +144,133 @@ func flagToTable(f flagVar) string {
 	return str
 }
 
-func getFlagColumn(f flagVar, align bool) string {
+func getAuthors(md bool) (ret string) {
+	if len(Authors) > 0 {
+		if md {
+			ret += "\n## Authors\n\n"
+
+			for _, author := range Authors {
+				ret += author + "\n"
+			}
+		} else {
+			ret += "AUTHORS\n"
+
+			for _, author := range Authors {
+				for i := 0; i < TabWidth; i++ {
+					ret += " "
+				}
+
+				ret += author + "\n"
+			}
+		}
+	}
+
+	return
+}
+
+func getBugEmail(md bool) (ret string) {
+	var lines []string
+
+	if BugEmail != "" {
+		if md {
+			lines = wrap(
+				"Email bug reports to <"+BugEmail+">.",
+				MaxWidth,
+			)
+			ret += "\n## Reporting bugs\n\n"
+
+			for _, line := range lines {
+				ret += line + "\n"
+			}
+		} else {
+			lines = wrap(
+				"Email bug reports to <"+BugEmail+">.",
+				MaxWidth-TabWidth,
+			)
+			ret += "\nBUG REPORTS\n"
+
+			for _, line := range lines {
+				for i := 0; i < TabWidth; i++ {
+					ret += " "
+				}
+
+				ret += line + "\n"
+			}
+		}
+	}
+
+	return
+}
+
+func getCustomSections(md bool) (ret string) {
+	for _, s := range sections {
+		if md {
+			ret += "\n## " + s.title + "\n\n"
+
+			for _, line := range wrap(s.text, MaxWidth) {
+				ret += line + "\n"
+			}
+		} else {
+			ret += s.title + "\n"
+
+			for _, line := range wrap(s.text, MaxWidth-TabWidth) {
+				for i := 0; i < TabWidth; i++ {
+					ret += " "
+				}
+
+				ret += line + "\n"
+			}
+
+			ret += "\n"
+		}
+	}
+
+	return
+}
+
+func getExitStatus(md bool) (ret string) {
+	if ExitStatus != "" {
+		if md {
+			ret += "\n## Exit status\n\n"
+
+			for _, line := range wrap(ExitStatus, MaxWidth) {
+				ret += line + "\n"
+			}
+		} else {
+			ret += "\nEXIT STATUS\n"
+
+			for _, line := range wrap(ExitStatus, MaxWidth-TabWidth) {
+				for i := 0; i < TabWidth; i++ {
+					ret += " "
+				}
+
+				ret += line + "\n"
+			}
+		}
+	}
+
+	return
+}
+
+func getFlagColumn(f *cliFlag, align bool) string {
 	var fillto int
 	var sep string
 	var str string
 
 	// Short flag
-	if len(f.short) > 0 {
+	if f.short != "" {
 		str += "-" + f.short
-		if (len(f.thetype) > 0) && (len(f.long) == 0) {
+		if (f.thetype != "") && (f.long == "") {
 			str += " " + f.thetype
 		}
 	}
 
 	// Separator
 	sep = "  "
-	if (len(f.short) > 0) && (len(f.long) > 0) {
+	if (f.short != "") && (f.long != "") {
 		sep = ", "
 	}
-	if len(f.short) > 0 {
+	if f.short != "" {
 		str += sep
 	}
 
@@ -405,9 +283,9 @@ func getFlagColumn(f flagVar, align bool) string {
 	}
 
 	// Long flag
-	if len(f.long) > 0 {
+	if f.long != "" {
 		str += "--" + f.long
-		if len(f.thetype) > 0 {
+		if f.thetype != "" {
 			str += "=" + f.thetype
 		}
 	}
@@ -415,10 +293,33 @@ func getFlagColumn(f flagVar, align bool) string {
 	return str
 }
 
+func getSeeAlso(md bool) (ret string) {
+	if len(SeeAlso) > 0 {
+		if md {
+			ret += "\n## See also\n\n"
+
+			for _, see := range SeeAlso {
+				ret += see + "\n"
+			}
+		} else {
+			ret += "\nSEE ALSO\n"
+
+			for _, see := range SeeAlso {
+				for i := 0; i < TabWidth; i++ {
+					ret += " "
+				}
+				ret += see + "\n"
+			}
+		}
+	}
+
+	return
+}
+
 func init() {
 	flag.Usage = func() { Usage(127) }
 	Flag(&help, "h", "help", false, "Display this help message.")
-	Flag(&readme, "readme", false, "Autogenerate a README.md file.")
+	Flag(&readme, "readme", false, "Autogenerate README.md.", true)
 }
 
 // Parse will run flag.Parse() and then check for the --help or
@@ -446,85 +347,19 @@ func PrintDefaults() {
 		}
 	}
 	if Align {
-		fmt.Fprint(os.Stderr, "\n")
+		fmt.Fprintln(os.Stderr)
 	}
 }
 
 // PrintExtra will print the Usage() extra details.
 func PrintExtra() {
 	var extra string
-	var lines []string
 
-	// Custom sections
-	for _, s := range sections {
-		extra += s.title + "\n"
-		lines = wrap(s.text, MaxWidth-TabWidth)
-		for _, line := range lines {
-			for i := 0; i < TabWidth; i++ {
-				extra += " "
-			}
-			extra += line + "\n"
-		}
-		extra += "\n"
-	}
-
-	// Author info
-	if len(Authors) > 0 {
-		extra += "AUTHORS\n"
-		for _, author := range Authors {
-			for i := 0; i < TabWidth; i++ {
-				extra += " "
-			}
-			extra += author + "\n"
-		}
-	}
-
-	// Info for reporting bugs
-	if len(BugEmail) > 0 {
-		lines = wrap(
-			strings.Join(
-				[]string{
-					"Email bug reports to the bug-reporting address ",
-					"(",
-					BugEmail,
-					").",
-				},
-				"",
-			),
-			MaxWidth-TabWidth,
-		)
-
-		extra += "\nBUG REPORTS\n"
-		for _, line := range lines {
-			for i := 0; i < TabWidth; i++ {
-				extra += " "
-			}
-			extra += line + "\n"
-		}
-	}
-
-	// Exit status info
-	if len(ExitStatus) > 0 {
-		extra += "\nEXIT STATUS\n"
-		lines = wrap(ExitStatus, MaxWidth-TabWidth)
-		for _, line := range lines {
-			for i := 0; i < TabWidth; i++ {
-				extra += " "
-			}
-			extra += line + "\n"
-		}
-	}
-
-	// See also for more info
-	if len(SeeAlso) > 0 {
-		extra += "\nSEE ALSO\n"
-		for _, see := range SeeAlso {
-			for i := 0; i < TabWidth; i++ {
-				extra += " "
-			}
-			extra += see + "\n"
-		}
-	}
+	extra += getCustomSections(false)
+	extra += getAuthors(false)
+	extra += getBugEmail(false)
+	extra += getExitStatus(false)
+	extra += getSeeAlso(false)
 
 	fmt.Fprint(os.Stderr, extra)
 }
@@ -590,60 +425,11 @@ func Readme() {
 		}
 	}
 
-	// Custom sections
-	for _, s := range sections {
-		readme += "\n## " + s.title + "\n\n"
-		lines = wrap(s.text, MaxWidth)
-		for _, line := range lines {
-			readme += line + "\n"
-		}
-	}
-
-	// Author info
-	if len(Authors) > 0 {
-		readme += "\n## Authors\n\n"
-		for _, author := range Authors {
-			readme += author + "\n"
-		}
-	}
-
-	// Info for reporting bugs
-	if len(BugEmail) > 0 {
-		lines = wrap(
-			strings.Join(
-				[]string{
-					"Email bug reports to the bug-reporting address ",
-					"(",
-					BugEmail,
-					").",
-				},
-				"",
-			),
-			MaxWidth,
-		)
-
-		readme += "\n## Reporting bugs\n\n"
-		for _, line := range lines {
-			readme += line + "\n"
-		}
-	}
-
-	// Exit status info
-	if len(ExitStatus) > 0 {
-		readme += "\n## Exit status\n\n"
-		lines = wrap(ExitStatus, MaxWidth)
-		for _, line := range lines {
-			readme += line + "\n"
-		}
-	}
-
-	// See also for more info
-	if len(SeeAlso) > 0 {
-		readme += "\n## See also\n\n"
-		for _, see := range SeeAlso {
-			readme += see + "\n"
-		}
-	}
+	readme += getCustomSections(true)
+	readme += getAuthors(true)
+	readme += getBugEmail(true)
+	readme += getExitStatus(true)
+	readme += getSeeAlso(true)
 
 	fmt.Print(readme)
 	os.Exit(0)
@@ -655,21 +441,21 @@ func Section(title string, text string) {
 	sections = append(sections, section{text: text, title: title})
 }
 
-func updateMaxWidth(f flagVar) {
+func updateMaxWidth(f *cliFlag) {
 	var sw = 2
 	var lw = 0
-	var dw = MaxWidth
+	var dw int
 
-	if (len(f.short) > 0) && (len(f.long) == 0) {
+	if (f.short != "") && (f.long == "") {
 		sw += len(f.thetype)
-		if len(f.thetype) > 0 {
+		if f.thetype != "" {
 			sw++
 		}
 	}
 
-	if len(f.long) > 0 {
+	if f.long != "" {
 		lw = 2 + len(f.long) + len(f.thetype)
-		if len(f.thetype) > 0 {
+		if f.thetype != "" {
 			lw++
 		}
 	}
@@ -711,14 +497,14 @@ func wrap(input string, width int) []string {
 			if len(line)+len(word)+1 > width {
 				lines = append(lines, line)
 				line = word
-			} else if len(line) == 0 {
+			} else if line == "" {
 				line = word
 			} else {
 				line += " " + word
 			}
 		}
 
-		if len(line) > 0 {
+		if line != "" {
 			lines = append(lines, line)
 		} else {
 			lines = append(lines, "")

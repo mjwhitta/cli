@@ -60,7 +60,7 @@ func init() {
     // Validate cli args
     if (cli.NArg() == 0) {
         cli.Usage(1)
-    } else if (len(astring) == 0) {
+    } else if astring == "" {
         cli.Usage(2)
     }
 }

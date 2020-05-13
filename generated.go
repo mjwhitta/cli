@@ -6,24 +6,24 @@ import (
 	"strconv"
 )
 
-// Float64List allows setting a value multiple times as in:
+// FloatList allows setting a value multiple times as in:
 // --flag=float1 --flag=float2
-type Float64List []float64
+type FloatList []float64
 
-// String will convert Float64List to a string.
-func (list *Float64List) String() string {
+// String will convert FloatList to a string.
+func (list *FloatList) String() string {
 	if len(*list) == 0 {
-		return ""
+		return "[]"
 	}
 	return fmt.Sprint(*list)
 }
 
-// Set will append a float64 to a Float64List.
-func (list *Float64List) Set(val string) error {
+// Set will append a float to a FloatList.
+func (list *FloatList) Set(val string) (e error) {
 	var v float64
-	v, _ = strconv.ParseFloat(val, 64)
+	v, e = strconv.ParseFloat(val, 64)
 	(*list) = append(*list, v)
-	return nil
+	return e
 }
 
 // IntList allows setting a value multiple times as in:
@@ -33,37 +33,17 @@ type IntList []int64
 // String will convert IntList to a string.
 func (list *IntList) String() string {
 	if len(*list) == 0 {
-		return ""
+		return "[]"
 	}
 	return fmt.Sprint(*list)
 }
 
 // Set will append a int to a IntList.
-func (list *IntList) Set(val string) error {
-	var v int64
-	v, _ = strconv.ParseInt(val, 0, 0)
-	(*list) = append(*list, v)
-	return nil
-}
-
-// Int64List allows setting a value multiple times as in:
-// --flag=int1 --flag=int2
-type Int64List []int64
-
-// String will convert Int64List to a string.
-func (list *Int64List) String() string {
-	if len(*list) == 0 {
-		return ""
-	}
-	return fmt.Sprint(*list)
-}
-
-// Set will append a int64 to a Int64List.
-func (list *Int64List) Set(val string) error {
+func (list *IntList) Set(val string) (e error) {
 	var v int64
 	v, _ = strconv.ParseInt(val, 0, 64)
 	(*list) = append(*list, v)
-	return nil
+	return e
 }
 
 // StringList allows setting a value multiple times as in:
@@ -73,15 +53,15 @@ type StringList []string
 // String will convert StringList to a string.
 func (list *StringList) String() string {
 	if len(*list) == 0 {
-		return ""
+		return "[]"
 	}
 	return fmt.Sprint(*list)
 }
 
 // Set will append a string to a StringList.
-func (list *StringList) Set(val string) error {
+func (list *StringList) Set(val string) (e error) {
 	(*list) = append(*list, val)
-	return nil
+	return e
 }
 
 // UintList allows setting a value multiple times as in:
@@ -91,35 +71,15 @@ type UintList []uint64
 // String will convert UintList to a string.
 func (list *UintList) String() string {
 	if len(*list) == 0 {
-		return ""
+		return "[]"
 	}
 	return fmt.Sprint(*list)
 }
 
 // Set will append a uint to a UintList.
-func (list *UintList) Set(val string) error {
-	var v uint64
-	v, _ = strconv.ParseUint(val, 0, 0)
-	(*list) = append(*list, v)
-	return nil
-}
-
-// Uint64List allows setting a value multiple times as in:
-// --flag=uint1 --flag=uint2
-type Uint64List []uint64
-
-// String will convert Uint64List to a string.
-func (list *Uint64List) String() string {
-	if len(*list) == 0 {
-		return ""
-	}
-	return fmt.Sprint(*list)
-}
-
-// Set will append a uint64 to a Uint64List.
-func (list *Uint64List) Set(val string) error {
+func (list *UintList) Set(val string) (e error) {
 	var v uint64
 	v, _ = strconv.ParseUint(val, 0, 64)
 	(*list) = append(*list, v)
-	return nil
+	return e
 }

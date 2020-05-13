@@ -15,7 +15,7 @@ var Align = false
 var Authors []string
 
 // Banner is the initial Usage() line.
-var Banner = fmt.Sprintf("%s [OPTIONS]", os.Args[0])
+var Banner string = fmt.Sprintf("%s [OPTIONS]", os.Args[0])
 
 // BugEmail is the configured email to send bug reports to.
 var BugEmail string
@@ -30,40 +30,44 @@ var colWidth = columnWidth{
 // ExitStatus is the description of program exit status.
 var ExitStatus string
 
-var flags []flagVar
+var flags []*cliFlag
 var help bool
 
 // Info is the description of how the program works.
-var Info = ""
+var Info string
 
 var less = func(i, j int) bool {
 	// Sort by long flag
 	var left = flags[i].long
-	if len(left) == 0 {
+	if left == "" {
 		left = flags[i].short
 	}
 
 	var right = flags[j].long
-	if len(right) == 0 {
+	if right == "" {
 		right = flags[j].short
 	}
 
 	// Fallback to short flag if comparing same long flag (should not
 	// happen)
 	if strings.ToLower(left) == strings.ToLower(right) {
-		if len(flags[i].short) != 0 {
+		if flags[i].short != "" {
 			left = flags[i].short
 		}
-		if len(flags[j].short) != 0 {
+		if flags[j].short != "" {
 			right = flags[j].short
 		}
 	}
 
-	return (strings.ToLower(left) < strings.ToLower(right))
+	if strings.ToLower(left) == strings.ToLower(right) {
+		return left < right
+	}
+
+	return strings.ToLower(left) < strings.ToLower(right)
 }
 
 // MaxWidth is how wide the Usage() message should be.
-var MaxWidth = 80
+var MaxWidth int = 80
 
 var readme bool
 var sections []section
@@ -72,11 +76,11 @@ var sections []section
 var SeeAlso []string
 
 // TabWidth determines the indentation size.
-var TabWidth = 4
+var TabWidth int = 4
 
 // Title is the title for the README.md generated with the --readme
 // flag.
 var Title string
 
 // Version is the package version.
-const Version = "1.7.9"
+const Version = "1.8.0"
