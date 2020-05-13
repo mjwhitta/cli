@@ -1,5 +1,7 @@
 # cli
 
+[![Go Report Card](https://goreportcard.com/badge/gitlab.com/mjwhitta/cli)](https://goreportcard.com/report/gitlab.com/mjwhitta/cli)
+
 ## What is this?
 
 A simple wrapper for golang's `flag` package.
