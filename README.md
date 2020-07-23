@@ -1,5 +1,7 @@
 # cli
 
+<a href="https://www.buymeacoffee.com/mjwhitta">🍪 Buy me a cookie</a>
+
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/mjwhitta/cli)](https://goreportcard.com/report/gitlab.com/mjwhitta/cli)
 
 ## What is this?
