@@ -6,7 +6,7 @@
 
 ## What is this?
 
-A simple wrapper for golang's `flag` package.
+A simple wrapper for Go's `flag` package.
 
 ## How to install
 
