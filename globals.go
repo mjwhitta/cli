@@ -1,7 +1,5 @@
 package cli
 
-//go:generate ./scripts/generate_go_funcs
-
 import (
 	"fmt"
 	"os"

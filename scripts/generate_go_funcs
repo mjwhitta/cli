@@ -156,4 +156,4 @@ $(
 )
 EOF
 
-go fmt "$file"
+go fmt "$file" >/dev/null
