@@ -22,23 +22,26 @@ func newFlag(args ...interface{}) (*cliFlag, error) {
 	var f *cliFlag = &cliFlag{}
 
 	for _, arg := range args {
-		switch arg.(type) {
+		switch arg := arg.(type) {
 		case *bool, *float64, *int, *int64, *string, *uint, *uint64:
 			f.ptr = arg
 		case *FloatList, *IntList, *StringList, *UintList:
 			f.isList = true
 			f.ptr = arg
 		case bool:
+			// First time thru, set val
 			if f.val == nil {
 				f.gotVal = true
 				f.val = arg
 			}
-			f.hidden = arg.(bool)
+
+			// Otherwise, set hidden
+			f.hidden = arg
 		case float64, int, int64, uint, uint64:
 			f.gotVal = true
 			f.val = arg
 		case string:
-			f.processString(arg.(string))
+			f.processString(arg)
 		default:
 			return nil, fmt.Errorf("cli: Unsupported flag type")
 		}

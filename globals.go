@@ -48,16 +48,18 @@ var less = func(i, j int) bool {
 
 	// Fallback to short flag if comparing same long flag (should not
 	// happen)
-	if strings.ToLower(left) == strings.ToLower(right) {
+	if strings.EqualFold(left, right) {
 		if flags[i].short != "" {
 			left = flags[i].short
 		}
+
 		if flags[j].short != "" {
 			right = flags[j].short
 		}
 	}
 
-	if strings.ToLower(left) == strings.ToLower(right) {
+	// Check again b/c values may have changed
+	if strings.EqualFold(left, right) {
 		return left < right
 	}
 
@@ -81,4 +83,4 @@ var TabWidth int = 4
 var Title string
 
 // Version is the package version.
-const Version = "1.8.1"
+const Version = "1.8.2"
