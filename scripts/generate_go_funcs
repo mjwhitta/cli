@@ -62,7 +62,8 @@ func (list *${type^}List) String() string {
 }
 
 // Set will append a $type to a ${type^}List.
-func (list *${type^}List) Set(val string) (e error) {
+func (list *${type^}List) Set(val string) error {
+    var e error
 $(
     case "$type" in
         "float")
@@ -86,7 +87,10 @@ EOL
             ;;
     esac
 )
-    return e
+    if e != nil {
+        return errors.Newf("failed to parse %s as $type: %w", val, e)
+    }
+    return nil
 }
 EOF
 }
@@ -147,6 +151,8 @@ package cli
 import (
     "fmt"
     "strconv"
+
+    "gitlab.com/mjwhitta/errors"
 )
 
 $(

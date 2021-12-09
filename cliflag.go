@@ -2,8 +2,9 @@ package cli
 
 import (
 	"flag"
-	"fmt"
 	"strings"
+
+	"gitlab.com/mjwhitta/errors"
 )
 
 type cliFlag struct {
@@ -43,7 +44,7 @@ func newFlag(args ...interface{}) (*cliFlag, error) {
 		case string:
 			f.processString(arg)
 		default:
-			return nil, fmt.Errorf("cli: Unsupported flag type")
+			return nil, errors.Newf("unsupported flag type")
 		}
 	}
 
@@ -196,29 +197,23 @@ func (f *cliFlag) setType() {
 
 func (f *cliFlag) validate() error {
 	if (f.short == "") && (f.long == "") {
-		return fmt.Errorf("cli: No flag provided")
+		return errors.New("no flag provided")
 	}
 
 	if len(f.short) > 1 {
-		return fmt.Errorf("cli: Invalid short flag \"%s\"", f.short)
+		return errors.Newf("invalid short flag \"-%s\"", f.short)
 	}
 
 	if len(f.long) == 1 {
-		return fmt.Errorf("cli: Invalid long flag \"%s\"", f.long)
+		return errors.Newf("invalid long flag \"--%s\"", f.long)
 	}
 
 	if f.desc == "" {
 		if f.long != "" {
-			return fmt.Errorf(
-				"cli: No description provided for \"%s\" flag",
-				f.long,
-			)
+			return errors.Newf("no description for \"--%s\"", f.long)
 		}
 
-		return fmt.Errorf(
-			"cli: No description provided for \"%s\" flag",
-			f.short,
-		)
+		return errors.Newf("no description for \"-%s\"", f.short)
 	}
 
 	return nil

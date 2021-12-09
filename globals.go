@@ -35,13 +35,13 @@ var help bool
 var Info string
 
 var less = func(i, j int) bool {
-	// Sort by long flag
 	var left = flags[i].long
+	var right = flags[j].long
+
+	// Sort by long flag, unless it is not defined
 	if left == "" {
 		left = flags[i].short
 	}
-
-	var right = flags[j].long
 	if right == "" {
 		right = flags[j].short
 	}
@@ -83,4 +83,4 @@ var TabWidth int = 4
 var Title string
 
 // Version is the package version.
-const Version = "1.8.2"
+const Version = "1.9.0"

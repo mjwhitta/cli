@@ -18,8 +18,8 @@ $ go get --ldflags="-s -w" --trimpath -u gitlab.com/mjwhitta/cli
 
 ## Usage
 
-See the [example](cmd/example) for in-depth usage. Below is a sample
-usage to create simple main package:
+See the [example](cmd/example) for an in-depth usage. Below is a
+sample usage to create simple main package:
 
 ```
 package main
@@ -32,64 +32,62 @@ import (
     "gitlab.com/mjwhitta/cli"
 )
 
-var abool bool
-var aint int
-var astring string
+// Flags
+var flags struct {
+    aBool   bool
+    aString string
+}
 
 func init() {
     // Configure cli package
-    cli.Align = true
-    cli.Authors = []string{"Some Person <someperson@some.domain>"}
-    cli.Banner = fmt.Sprintf("Usage: %s [OPTIONS] <arg>", os.Args[0])
-    cli.BugEmail = "bugs@some.domain"
+    cli.Align = true // Defaults to false
+    cli.Authors = []string{"Your Name <your@email.tld>"}
+    cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
     cli.ExitStatus = strings.Join(
         []string{
-            "Normally the exit status is 0. In the event of invalid",
-            "or missing arguments, the exit status will be non-zero.",
+            "Normally the exit status is 0. In the event of an",
+            "error, the exit status will be 1.",
         },
         " ",
     )
-    cli.Info = "A sample usage for the cli package"
-    cli.MaxWidth = 80 // Default
-    cli.SeeAlso = []string{"some", "other", "tools"}
-    cli.TabWidth = 4 // Default
-    cli.Title = "Some tool" // Used for README.md title
+    cli.Info = "Lorem ipsum dolor sit amet, consectetur adipiscing"
 
     // Parse cli flags
-    cli.Flag(&abool, "bool", false, "Example for bool flag.")
-    cli.Flag(&aint, "i", "int", 0, "Example for int flag.")
-    cli.Flag(&astring, "string", "value", "Example for string flag.")
+    cli.Flag(&flags.aBool, "b", "bool", false, "Sample boolean flag.")
+    cli.Flag(&flags.aString, "s", "", "Sample string flag.")
     cli.Parse()
 
     // Validate cli args
-    if (cli.NArg() == 0) {
+    if cli.NArg() == 0 {
         cli.Usage(1)
-    } else if astring == "" {
-        cli.Usage(2)
+    } else if cli.NArg() > 1 {
+        cli.Usage(1)
+    } else if flags.aString == "" {
+        cli.Usage(1)
     }
 }
 
 func main() {
-    fmt.Printf("%t\n", abool)
-    fmt.Printf("%d\n", aint)
-    fmt.Printf("%s\n", astring)
-    fmt.Printf("%d %s\n", cli.NArg(), cli.Args())
+    fmt.Printf("%t\n", flags.aBool)
+    fmt.Printf("%s\n", flags.aString)
+    fmt.Printf("%d - %s\n", cli.NArg(), cli.Args())
 }
 ```
 
 ### Configuring
 
-Export                | Default               | Description
-------                | -------               | -----------
-`cli.Align`           | false                 | Aligned the columns
-`cli.Authors`         | [""]                  | List of authors
-`cli.Banner`          | "Usage: $0 [OPTIONS]" | The usage example
-`cli.BugEmail`        | ""                    | Email for reporting bugs
-`cli.Info`            | ""                    | The description of the tool
-`cli.MaxWidth`        | 80                    | Maximum width of usage
-`cli.SeeAlso`         | [""]                  | List of other packages for more info
-`cli.TabWidth`        | 4                     | The number of spaces between columns
-`cli.Title`           | ""                    | Title for generated README.md
+Export           | Default               | Description
+------           | -------               | -----------
+`cli.Align`      | false                 | Aligned the columns
+`cli.Authors`    | [""]                  | List of authors
+`cli.Banner`     | "Usage: $0 [OPTIONS]" | The usage example
+`cli.BugEmail`   | ""                    | Email for reporting bugs
+`cli.ExitStatus` | ""                    | Description of all possible exit statuses
+`cli.Info`       | ""                    | The description of the tool
+`cli.MaxWidth`   | 80                    | Maximum width of usage
+`cli.SeeAlso`    | [""]                  | List of other packages for more info
+`cli.TabWidth`   | 4                     | The number of spaces between columns
+`cli.Title`      | ""                    | Title for generated README.md
 
 ### Functions
 

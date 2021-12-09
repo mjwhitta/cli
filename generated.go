@@ -4,6 +4,8 @@ package cli
 import (
 	"fmt"
 	"strconv"
+
+	"gitlab.com/mjwhitta/errors"
 )
 
 // FloatList allows setting a value multiple times as in:
@@ -19,11 +21,15 @@ func (list *FloatList) String() string {
 }
 
 // Set will append a float to a FloatList.
-func (list *FloatList) Set(val string) (e error) {
+func (list *FloatList) Set(val string) error {
+	var e error
 	var v float64
 	v, e = strconv.ParseFloat(val, 64)
 	(*list) = append(*list, v)
-	return e
+	if e != nil {
+		return errors.Newf("failed to parse %s as float: %w", val, e)
+	}
+	return nil
 }
 
 // IntList allows setting a value multiple times as in:
@@ -39,11 +45,15 @@ func (list *IntList) String() string {
 }
 
 // Set will append a int to a IntList.
-func (list *IntList) Set(val string) (e error) {
+func (list *IntList) Set(val string) error {
+	var e error
 	var v int64
 	v, _ = strconv.ParseInt(val, 0, 64)
 	(*list) = append(*list, v)
-	return e
+	if e != nil {
+		return errors.Newf("failed to parse %s as int: %w", val, e)
+	}
+	return nil
 }
 
 // StringList allows setting a value multiple times as in:
@@ -59,9 +69,13 @@ func (list *StringList) String() string {
 }
 
 // Set will append a string to a StringList.
-func (list *StringList) Set(val string) (e error) {
+func (list *StringList) Set(val string) error {
+	var e error
 	(*list) = append(*list, val)
-	return e
+	if e != nil {
+		return errors.Newf("failed to parse %s as string: %w", val, e)
+	}
+	return nil
 }
 
 // UintList allows setting a value multiple times as in:
@@ -77,9 +91,13 @@ func (list *UintList) String() string {
 }
 
 // Set will append a uint to a UintList.
-func (list *UintList) Set(val string) (e error) {
+func (list *UintList) Set(val string) error {
+	var e error
 	var v uint64
 	v, _ = strconv.ParseUint(val, 0, 64)
 	(*list) = append(*list, v)
-	return e
+	if e != nil {
+		return errors.Newf("failed to parse %s as uint: %w", val, e)
+	}
+	return nil
 }

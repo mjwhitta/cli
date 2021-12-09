@@ -8,6 +8,18 @@ import (
 	"gitlab.com/mjwhitta/cli"
 )
 
+// Exit status
+const (
+	Good = iota
+	InvalidOption
+	MissingOption
+	InvalidArgument
+	MissingArgument
+	ExtraArgument
+	Exception
+)
+
+// Flags
 var flags struct {
 	aBool       bool
 	aFloat      float64
@@ -28,11 +40,12 @@ func init() {
 		[]string{
 			"Normally the exit status is 0. In the event of an error",
 			"the exit status will be one of the below:\n\n",
-			"  1: Invalid option\n",
-			"  2: Invalid argument\n",
-			"  3: Missing argument\n",
-			"  4: Extra arguments\n",
-			"  5: Exception",
+			fmt.Sprintf("  %d: Invalid option\n", InvalidOption),
+			fmt.Sprintf("  %d: Missing option\n", MissingOption),
+			fmt.Sprintf("  %d: Invalid argument\n", InvalidArgument),
+			fmt.Sprintf("  %d: Missing argument\n", MissingArgument),
+			fmt.Sprintf("  %d: Extra argument\n", ExtraArgument),
+			fmt.Sprintf("  %d: Exception", Exception),
 		},
 		" ",
 	)
@@ -79,11 +92,11 @@ func init() {
 
 	// Validate cli args
 	if cli.NArg() == 0 {
-		cli.Usage(3)
+		cli.Usage(MissingArgument)
 	} else if cli.NArg() > 1 {
-		cli.Usage(4)
+		cli.Usage(ExtraArgument)
 	} else if flags.aString == "" {
-		cli.Usage(1)
+		cli.Usage(MissingOption)
 	}
 }
 
