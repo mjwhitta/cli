@@ -22,6 +22,7 @@ const (
 // Flags
 var flags struct {
 	aBool       bool
+	aCounter    cli.Counter
 	aFloat      float64
 	aInt        int
 	anIntList   cli.IntList
@@ -82,10 +83,11 @@ func init() {
 
 	// Parse cli flags
 	cli.Flag(&flags.aBool, "b", "bool", false, "Sample boolean flag.")
+	cli.Flag(&flags.aCounter, "c", "cnt", "Sample counter flag.")
 	cli.Flag(&flags.aFloat, "f", "float", 0.0, "Sample float flag.")
 	cli.Flag(&flags.aInt, "i", 0, "Sample", "int flag.")
 	cli.Flag(&flags.anIntList, "int", "Sample int list flag.")
-	cli.Flag(&flags.aString, "s", "", "Sample string flag.")
+	cli.Flag(&flags.aString, "s", "", "Mandatory sample string flag.")
 	cli.Flag(&flags.aStringList, "string", "Sample string list flag.")
 	cli.Flag(&flags.aUint, "u", "uint", 0, "Sample uint flag.")
 	cli.Parse()
@@ -101,22 +103,31 @@ func init() {
 }
 
 func main() {
-	fmt.Printf("%t\n", flags.aBool)
-	fmt.Printf("%f\n", flags.aFloat)
-	fmt.Printf("%d\n", flags.aInt)
-	fmt.Printf("%d - %v\n", len(flags.anIntList), flags.anIntList)
+	fmt.Printf("bool: %t\n", flags.aBool)
+	fmt.Printf("Counter: %v\n", flags.aCounter)
+	fmt.Printf("float: %f\n", flags.aFloat)
+	fmt.Printf("int: %d\n", flags.aInt)
 	fmt.Printf(
-		"%d - %s\n",
+		"IntList: %d - %v\n",
+		len(flags.anIntList),
+		flags.anIntList,
+	)
+	fmt.Printf(
+		"IntList: %d - %s\n",
 		len(flags.anIntList),
 		flags.anIntList.String(),
 	)
-	fmt.Printf("%s\n", flags.aString)
-	fmt.Printf("%d - %v\n", len(flags.aStringList), flags.aStringList)
+	fmt.Printf("string: %s\n", flags.aString)
 	fmt.Printf(
-		"%d - %s\n",
+		"StringList: %d - %v\n",
+		len(flags.aStringList),
+		flags.aStringList,
+	)
+	fmt.Printf(
+		"StringList: %d - %s\n",
 		len(flags.aStringList),
 		flags.aStringList.String(),
 	)
-	fmt.Printf("%d\n", flags.aUint)
-	fmt.Printf("%d - %s\n", cli.NArg(), cli.Args())
+	fmt.Printf("uint: %d\n", flags.aUint)
+	fmt.Printf("args: %d - %s\n", cli.NArg(), cli.Args())
 }

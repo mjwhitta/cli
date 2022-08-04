@@ -23,14 +23,14 @@ type section struct {
 // Flag will process the provided values to create a cli flag. Below
 // are a few examples:
 //
-//    var short bool
-//    cli.Flag(&short, "s", false, "An example bool short flag")
+//	var short bool
+//	cli.Flag(&short, "s", false, "An example bool short flag")
 //
-//    var long string
-//    cli.Flag(&long, "long", "asdf", "An example string long flag")
+//	var long string
+//	cli.Flag(&long, "long", "asdf", "An example string long flag")
 //
-//    var both int
-//    cli.Flag(&both, "b", "both", 0, "An example int flag")
+//	var both int
+//	cli.Flag(&both, "b", "both", 0, "An example int flag")
 func Flag(args ...interface{}) {
 	var e error
 	var f *cliFlag

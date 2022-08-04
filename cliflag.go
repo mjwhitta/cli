@@ -26,7 +26,7 @@ func newFlag(args ...interface{}) (*cliFlag, error) {
 		switch arg := arg.(type) {
 		case *bool, *float64, *int, *int64, *string, *uint, *uint64:
 			f.ptr = arg
-		case *FloatList, *IntList, *StringList, *UintList:
+		case *Counter, *FloatList, *IntList, *StringList, *UintList:
 			f.isList = true
 			f.ptr = arg
 		case bool:
@@ -66,6 +66,8 @@ func (f *cliFlag) enableLong() {
 	switch f.ptr.(type) {
 	case *bool:
 		flag.BoolVar(f.ptr.(*bool), f.long, f.val.(bool), f.desc)
+	case *Counter:
+		flag.Var(f.ptr.(*Counter), f.long, f.desc)
 	case *float64:
 		flag.Float64Var(
 			f.ptr.(*float64),
@@ -117,6 +119,8 @@ func (f *cliFlag) enableShort() {
 	switch f.ptr.(type) {
 	case *bool:
 		flag.BoolVar(f.ptr.(*bool), f.short, f.val.(bool), f.desc)
+	case *Counter:
+		flag.Var(f.ptr.(*Counter), f.short, f.desc)
 	case *float64:
 		flag.Float64Var(
 			f.ptr.(*float64),
