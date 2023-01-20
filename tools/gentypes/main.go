@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"gitlab.com/mjwhitta/errors"
+	"github.com/mjwhitta/errors"
 )
 
 func generateFuncs(f *os.File, t string) {
@@ -66,7 +66,7 @@ func header(f *os.File) {
 	f.WriteString("import (\n")
 	f.WriteString("    \"fmt\"\n")
 	f.WriteString("    \"strconv\"\n\n")
-	f.WriteString("    \"gitlab.com/mjwhitta/errors\"\n")
+	f.WriteString("    \"github.com/mjwhitta/errors\"\n")
 	f.WriteString(")\n")
 }
 

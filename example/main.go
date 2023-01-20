@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"gitlab.com/mjwhitta/cli"
+	"github.com/mjwhitta/cli"
 )
 
 // Exit status

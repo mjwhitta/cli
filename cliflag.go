@@ -4,7 +4,7 @@ import (
 	"flag"
 	"strings"
 
-	"gitlab.com/mjwhitta/errors"
+	"github.com/mjwhitta/errors"
 )
 
 type cliFlag struct {

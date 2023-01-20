@@ -2,7 +2,7 @@
 
 <a href="https://www.buymeacoffee.com/mjwhitta">🍪 Buy me a cookie</a>
 
-[![Go Report Card](https://goreportcard.com/badge/gitlab.com/mjwhitta/cli)](https://goreportcard.com/report/gitlab.com/mjwhitta/cli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mjwhitta/cli)](https://goreportcard.com/report/github.com/mjwhitta/cli)
 
 ## What is this?
 
@@ -13,7 +13,7 @@ A simple wrapper for Go's `flag` package.
 Open a terminal and run the following:
 
 ```
-$ go get --ldflags="-s -w" --trimpath -u gitlab.com/mjwhitta/cli
+$ go get --ldflags="-s -w" --trimpath -u github.com/mjwhitta/cli
 ```
 
 ## Usage
@@ -29,7 +29,7 @@ import (
     "os"
     "strings"
 
-    "gitlab.com/mjwhitta/cli"
+    "github.com/mjwhitta/cli"
 )
 
 // Flags
@@ -116,4 +116,4 @@ And finally to print the usage message use `Usage(status int)`
 
 ## Links
 
-- [Source](https://gitlab.com/mjwhitta/cli)
+- [Source](https://github.com/mjwhitta/cli)
