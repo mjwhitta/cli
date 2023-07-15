@@ -94,9 +94,9 @@ Export           | Default               | Description
 
 The following methods can be used to create flags:
 
-- `Flag(ptr *interface{}, long string, val interface{}, desc string)`
-- `Flag(ptr *interface{}, short string, val interface{}, desc string)`
-- `Flag(ptr *interface{}, short string, long string, val interface{}, desc string)`
+- `Flag(ptr *any, long string, val any, desc string)`
+- `Flag(ptr *any, short string, val any, desc string)`
+- `Flag(ptr *any, short string, long string, val any, desc string)`
 
 You can use `Section(title string, text string)` to add new custom
 sections. Other functions that simply wrap the `flag` package include:

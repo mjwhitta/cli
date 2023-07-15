@@ -15,11 +15,11 @@ type cliFlag struct {
 	long    string
 	short   string
 	thetype string
-	ptr     interface{}
-	val     interface{}
+	ptr     any
+	val     any
 }
 
-func newFlag(args ...interface{}) (*cliFlag, error) {
+func newFlag(args ...any) (*cliFlag, error) {
 	var f *cliFlag = &cliFlag{}
 
 	for _, arg := range args {

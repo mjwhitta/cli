@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/mjwhitta/cli"
 )
@@ -37,45 +36,33 @@ func init() {
 	cli.Authors = []string{"Miles Whittaker <mj@whitta.dev>"}
 	cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
 	cli.BugEmail = "cli.bugs@whitta.dev"
-	cli.ExitStatus = strings.Join(
-		[]string{
-			"Normally the exit status is 0. In the event of an error",
-			"the exit status will be one of the below:\n\n",
-			fmt.Sprintf("  %d: Invalid option\n", InvalidOption),
-			fmt.Sprintf("  %d: Missing option\n", MissingOption),
-			fmt.Sprintf("  %d: Invalid argument\n", InvalidArgument),
-			fmt.Sprintf("  %d: Missing argument\n", MissingArgument),
-			fmt.Sprintf("  %d: Extra argument\n", ExtraArgument),
-			fmt.Sprintf("  %d: Exception", Exception),
-		},
-		" ",
+	cli.ExitStatus(
+		"Normally the exit status is 0. In the event of an error",
+		"the exit status will be one of the below:\n\n",
+		fmt.Sprintf("  %d: Invalid option\n", InvalidOption),
+		fmt.Sprintf("  %d: Missing option\n", MissingOption),
+		fmt.Sprintf("  %d: Invalid argument\n", InvalidArgument),
+		fmt.Sprintf("  %d: Missing argument\n", MissingArgument),
+		fmt.Sprintf("  %d: Extra argument\n", ExtraArgument),
+		fmt.Sprintf("  %d: Exception", Exception),
 	)
-	cli.Info = strings.Join(
-		[]string{
-			"Lorem ipsum dolor sit amet, consectetur adipiscing",
-			"elit. Mauris ut augue euismod, cursus nulla ut, semper",
-			"eros. Integer pulvinar a lectus sed pretium. Cras a",
-			"luctus odio, eget sagittis leo. Interdum et malesuada",
-			"fames ac ante ipsum primis in faucibus.",
-		},
-		" ",
+	cli.Info(
+		"Lorem ipsum dolor sit amet, consectetur adipiscing",
+		"elit. Mauris ut augue euismod, cursus nulla ut, semper",
+		"eros. Integer pulvinar a lectus sed pretium. Cras a",
+		"luctus odio, eget sagittis leo. Interdum et malesuada",
+		"fames ac ante ipsum primis in faucibus.",
 	)
 	cli.MaxWidth = 80 // Defaults to 80
 	cli.Section(
 		"CUSTOM SECTION EXAMPLE",
-		strings.Join(
-			[]string{
-				"Nunc lectus metus, consectetur et tellus tempus,",
-				"accumsan rhoncus arcu.\n\n",
-				"Ut velit dui, aliquet eget tellus eget, commodo",
-				"auctor enim.\n\n",
-				"Duis blandit, metus vitae sagittis vestibulum, diam",
-				"nisl fermentum lorem, non convallis enim urna",
-				"rutrum mauris.\n\n",
-				"Duis in scelerisque mauris.",
-			},
-			" ",
-		),
+		"Nunc lectus metus, consectetur et tellus tempus, accumsan",
+		"rhoncus arcu.\n\n",
+		"Ut velit dui, aliquet eget tellus eget, commodo auctor",
+		"enim.\n\n",
+		"Duis blandit, metus vitae sagittis vestibulum, diam nisl",
+		"fermentum lorem, non convallis enim urna rutrum mauris.\n\n",
+		"Duis in scelerisque mauris.",
 	)
 	cli.SeeAlso = []string{"flag"}
 	cli.TabWidth = 4 // Defaults to 4

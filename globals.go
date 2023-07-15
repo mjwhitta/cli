@@ -27,15 +27,10 @@ var colWidth = columnWidth{
 	short: 0,
 }
 
-// ExitStatus is the description of program exit status.
-var ExitStatus string
-
+var exitStatus string
 var flags []*cliFlag
 var help bool
-
-// Info is the description of how the program works.
-var Info string
-
+var info string
 var less = func(i, j int) bool {
 	var left = flags[i].long
 	var right = flags[j].long
@@ -85,4 +80,4 @@ var TabWidth int = 4
 var Title string
 
 // Version is the package version.
-const Version = "1.10.1"
+const Version = "1.11.0"

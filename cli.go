@@ -20,6 +20,11 @@ type section struct {
 	title string
 }
 
+// ExitStatus sets the description of the program exit status.
+func ExitStatus(text ...string) {
+	exitStatus = strings.Join(text, " ")
+}
+
 // Flag will process the provided values to create a cli flag. Below
 // are a few examples:
 //
@@ -31,7 +36,7 @@ type section struct {
 //
 //	var both int
 //	cli.Flag(&both, "b", "both", 0, "An example int flag")
-func Flag(args ...interface{}) {
+func Flag(args ...any) {
 	var e error
 	var f *cliFlag
 
@@ -229,17 +234,17 @@ func getCustomSections(md bool) (ret string) {
 }
 
 func getExitStatus(md bool) (ret string) {
-	if ExitStatus != "" {
+	if exitStatus != "" {
 		if md {
 			ret += "\n## Exit status\n\n"
 
-			for _, line := range wrap(ExitStatus, MaxWidth) {
+			for _, line := range wrap(exitStatus, MaxWidth) {
 				ret += line + "\n"
 			}
 		} else {
 			ret += "\nEXIT STATUS\n"
 
-			for _, line := range wrap(ExitStatus, MaxWidth-TabWidth) {
+			for _, line := range wrap(exitStatus, MaxWidth-TabWidth) {
 				for i := 0; i < TabWidth; i++ {
 					ret += " "
 				}
@@ -316,6 +321,11 @@ func getSeeAlso(md bool) (ret string) {
 	return
 }
 
+// Info sets the description of how the program works.
+func Info(text ...string) {
+	info = strings.Join(text, " ")
+}
+
 func init() {
 	flag.Usage = func() { Usage(127) }
 	Flag(&help, "h", "help", false, "Display this help message.")
@@ -376,7 +386,7 @@ func PrintHeader() {
 
 	header += "\nDESCRIPTION\n"
 
-	lines = wrap(Info, MaxWidth-TabWidth)
+	lines = wrap(info, MaxWidth-TabWidth)
 	for _, line := range lines {
 		for j := 0; j < TabWidth; j++ {
 			header += " "
@@ -407,7 +417,7 @@ func Readme() {
 
 	// Description
 	readme += "\n## Description\n\n"
-	lines = wrap(Info, MaxWidth)
+	lines = wrap(info, MaxWidth)
 	for _, line := range lines {
 		readme += line + "\n"
 	}
@@ -437,8 +447,14 @@ func Readme() {
 
 // Section will add a new custom section with the specified title and
 // text.
-func Section(title string, text string) {
-	sections = append(sections, section{text: text, title: title})
+func Section(title string, text ...string) {
+	sections = append(
+		sections,
+		section{
+			text:  strings.Join(text, " "),
+			title: title,
+		},
+	)
 }
 
 func updateMaxWidth(f *cliFlag) {
