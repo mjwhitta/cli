@@ -37,8 +37,8 @@ func init() {
 	cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
 	cli.BugEmail = "cli.bugs@whitta.dev"
 	cli.ExitStatus(
-		"Normally the exit status is 0. In the event of an error",
-		"the exit status will be one of the below:\n\n",
+		"Normally the exit status is 0. In the event of an error the",
+		"exit status will be one of the below:\n\n",
 		fmt.Sprintf("  %d: Invalid option\n", InvalidOption),
 		fmt.Sprintf("  %d: Missing option\n", MissingOption),
 		fmt.Sprintf("  %d: Invalid argument\n", InvalidArgument),
@@ -47,11 +47,11 @@ func init() {
 		fmt.Sprintf("  %d: Exception", Exception),
 	)
 	cli.Info(
-		"Lorem ipsum dolor sit amet, consectetur adipiscing",
-		"elit. Mauris ut augue euismod, cursus nulla ut, semper",
-		"eros. Integer pulvinar a lectus sed pretium. Cras a",
-		"luctus odio, eget sagittis leo. Interdum et malesuada",
-		"fames ac ante ipsum primis in faucibus.",
+		"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+		"Mauris ut augue euismod, cursus nulla ut, semper eros.",
+		"Integer pulvinar a lectus sed pretium. Cras a luctus odio,",
+		"eget sagittis leo. Interdum et malesuada fames ac ante",
+		"ipsum primis in faucibus.",
 	)
 	cli.MaxWidth = 80 // Defaults to 80
 	cli.Section(
