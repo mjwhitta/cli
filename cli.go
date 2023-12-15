@@ -29,13 +29,23 @@ func ExitStatus(text ...string) {
 // are a few examples:
 //
 //	var short bool
-//	cli.Flag(&short, "s", false, "An example bool short flag")
+//	cli.Flag(&short, "s", false, "A short bool flag.")
 //
 //	var long string
-//	cli.Flag(&long, "long", "asdf", "An example string long flag")
+//	cli.Flag(&long, "long", "asdf", "A long string flag.")
 //
 //	var both int
-//	cli.Flag(&both, "b", "both", 0, "An example int flag")
+//	cli.Flag(&both, "b", "both", 0, "A short/long int flag.")
+//
+//	var secret bool
+//	cli.Flag(
+//		&secret,
+//		"s",
+//		"secret",
+//		false,
+//		"A flag can be hidden by passing true as the last arg.",
+//		true,
+//	)
 func Flag(args ...any) {
 	var e error
 	var f *cliFlag

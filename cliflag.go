@@ -31,13 +31,12 @@ func newFlag(args ...any) (*cliFlag, error) {
 			f.ptr = arg
 		case bool:
 			// First time thru, set val
-			if f.val == nil {
+			if !f.gotVal {
 				f.gotVal = true
 				f.val = arg
+			} else { // Otherwise, set hidden
+				f.hidden = arg
 			}
-
-			// Otherwise, set hidden
-			f.hidden = arg
 		case float64, int, int64, uint, uint64:
 			f.gotVal = true
 			f.val = arg
