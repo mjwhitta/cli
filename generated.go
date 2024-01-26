@@ -12,7 +12,7 @@ import (
 // --flag=float1 --flag=float2
 type FloatList []float64
 
-// String will convert FloatList to a string.
+// String will return a string representation of the FloatList.
 func (list *FloatList) String() string {
 	if len(*list) == 0 {
 		return "[]"
@@ -38,7 +38,7 @@ func (list *FloatList) Set(val string) error {
 // --flag=int1 --flag=int2
 type IntList []int64
 
-// String will convert IntList to a string.
+// String will return a string representation of the IntList.
 func (list *IntList) String() string {
 	if len(*list) == 0 {
 		return "[]"
@@ -64,7 +64,7 @@ func (list *IntList) Set(val string) error {
 // --flag=string1 --flag=string2
 type StringList []string
 
-// String will convert StringList to a string.
+// String will return a string representation of the StringList.
 func (list *StringList) String() string {
 	if len(*list) == 0 {
 		return "[]"
@@ -83,7 +83,7 @@ func (list *StringList) Set(val string) error {
 // --flag=uint1 --flag=uint2
 type UintList []uint64
 
-// String will convert UintList to a string.
+// String will return a string representation of the UintList.
 func (list *UintList) String() string {
 	if len(*list) == 0 {
 		return "[]"

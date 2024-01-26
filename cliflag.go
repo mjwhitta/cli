@@ -52,6 +52,47 @@ func newFlag(args ...any) (*cliFlag, error) {
 	return f, nil
 }
 
+func (f *cliFlag) column(align bool) string {
+	var fillto int
+	var sep string
+	var str string
+
+	// Short flag
+	if f.short != "" {
+		str += "-" + f.short
+		if (f.thetype != "") && (f.long == "") {
+			str += " " + f.thetype
+		}
+	}
+
+	// Separator
+	sep = "  "
+	if (f.short != "") && (f.long != "") {
+		sep = ", "
+	}
+	if f.short != "" {
+		str += sep
+	}
+
+	// Alignment
+	if align {
+		fillto = colWidth.short + len(sep) - len(str)
+		for i := 0; i < fillto; i++ {
+			str += " "
+		}
+	}
+
+	// Long flag
+	if f.long != "" {
+		str += "--" + f.long
+		if f.thetype != "" {
+			str += "=" + f.thetype
+		}
+	}
+
+	return str
+}
+
 func (f *cliFlag) enable() {
 	f.enableShort()
 	f.enableLong()
@@ -196,6 +237,125 @@ func (f *cliFlag) setType() {
 	case *uint, *uint64, *UintList:
 		f.thetype = "UINT"
 	}
+}
+
+// String will return a string representation of the cliFlag.
+func (f *cliFlag) String() string {
+	var enoughRoom bool = (TabWidth + colWidth.left) <= (MaxWidth / 2)
+	var fillto int
+	var lines []string
+	var str string
+
+	// Leading space
+	for i := 0; i < TabWidth; i++ {
+		str += " "
+	}
+
+	// Flags
+	str += f.column(Align && enoughRoom)
+
+	// Description
+	if Align && enoughRoom {
+		// Filler
+		fillto = TabWidth + colWidth.left - len(str)
+		for i := 0; i < fillto; i++ {
+			str += " "
+		}
+
+		lines = wrap(f.desc, colWidth.desc)
+		for i, line := range lines {
+			if i > 0 {
+				// Leading space plus filler
+				for j := 0; j < (TabWidth + colWidth.left); j++ {
+					str += " "
+				}
+			}
+
+			// Alignment
+			for j := 0; j < TabWidth; j++ {
+				str += " "
+			}
+
+			// Actual description
+			str += line + "\n"
+		}
+	} else {
+		// New line b/c colWidth.left is too big
+		str += "\n"
+
+		lines = wrap(f.desc, MaxWidth-(2*TabWidth))
+		for _, line := range lines {
+			// Leading space plus filler
+			for i := 0; i < (2 * TabWidth); i++ {
+				str += " "
+			}
+
+			// Actual description
+			str += line + "\n"
+		}
+		str += "\n"
+	}
+
+	return str
+}
+
+func (f *cliFlag) table() string {
+	var str string
+
+	// Option
+	if f.short != "" {
+		str += "`-" + f.short + "`"
+	}
+	if (f.short != "") && (f.long != "") {
+		str += ", "
+	}
+	if f.long != "" {
+		str += "`--" + f.long + "`"
+	}
+
+	// Separator
+	str += " | "
+
+	// Args
+	if f.thetype != "" {
+		str += "`" + f.thetype + "`"
+	}
+
+	// Separator
+	str += " | "
+
+	// Description
+	str += f.desc + "\n"
+
+	return str
+}
+
+func (f *cliFlag) updateMaxWidth() {
+	var dw int
+	var lw int = 0
+	var sep int = 2
+	var sw int = 2
+
+	if f.long != "" {
+		lw = 2 + len(f.long) + len(f.thetype)
+
+		if f.thetype != "" {
+			lw++
+		}
+	}
+
+	dw = MaxWidth - TabWidth - sw - sep - lw - TabWidth
+
+	if dw < colWidth.desc {
+		colWidth.desc = dw
+	}
+
+	if lw > colWidth.long {
+		colWidth.long = lw
+	}
+
+	colWidth.short = 2
+	colWidth.left = colWidth.short + sep + colWidth.long
 }
 
 func (f *cliFlag) validate() error {

@@ -27,47 +27,51 @@ var colWidth = columnWidth{
 	short: 0,
 }
 
-var exitStatus string
-var flags []*cliFlag
-var help bool
-var info string
-var less = func(i, j int) bool {
-	var left = flags[i].long
-	var right = flags[j].long
+var (
+	exitStatus string
+	flags      []*cliFlag
+	help       bool
+	info       string
+	less       = func(i, j int) bool {
+		var left string = flags[i].long
+		var right string = flags[j].long
 
-	// Sort by long flag, unless it is not defined
-	if left == "" {
-		left = flags[i].short
-	}
-	if right == "" {
-		right = flags[j].short
-	}
-
-	// Fallback to short flag if comparing same long flag (should not
-	// happen)
-	if strings.EqualFold(left, right) {
-		if flags[i].short != "" {
+		// Sort by long flag, unless it is not defined
+		if left == "" {
 			left = flags[i].short
 		}
-
-		if flags[j].short != "" {
+		if right == "" {
 			right = flags[j].short
 		}
-	}
 
-	// Check again b/c values may have changed
-	if strings.EqualFold(left, right) {
-		return left < right
-	}
+		// Fallback to short flag if comparing same long flag (should
+		// not happen)
+		if strings.EqualFold(left, right) {
+			if flags[i].short != "" {
+				left = flags[i].short
+			}
 
-	return strings.ToLower(left) < strings.ToLower(right)
-}
+			if flags[j].short != "" {
+				right = flags[j].short
+			}
+		}
+
+		// Check again b/c values may have changed
+		if strings.EqualFold(left, right) {
+			return left < right
+		}
+
+		return strings.ToLower(left) < strings.ToLower(right)
+	}
+)
 
 // MaxWidth is how wide the Usage() message should be.
 var MaxWidth int = 80
 
-var readme bool
-var sections []section
+var (
+	readme   bool
+	sections []section
+)
 
 // SeeAlso is a list of related tools.
 var SeeAlso []string
@@ -80,4 +84,4 @@ var TabWidth int = 4
 var Title string
 
 // Version is the package version.
-const Version = "1.12.0"
+const Version = "1.12.1"

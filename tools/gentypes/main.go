@@ -23,7 +23,8 @@ func generateFuncs(f *os.File, t string) {
 	f.WriteString("\n\n")
 
 	// String() func
-	f.WriteString("// String will convert " + tn + " to a string.\n")
+	f.WriteString("// String will return a string representation of ")
+	f.WriteString("the " + tn + ".\n")
 	f.WriteString("func (list *" + tn + ") String() string {\n")
 	f.WriteString("    if len(*list) == 0 {\n")
 	f.WriteString("        return \"[]\"\n")
@@ -80,7 +81,7 @@ func main() {
 	var e error
 	var f *os.File
 	var fn string = "generated.go"
-	var types = []string{"float", "int", "string", "uint"}
+	var types []string = []string{"float", "int", "string", "uint"}
 
 	if f, e = os.Create(fn); e != nil {
 		panic(errors.Newf("failed to create %s: %w", fn, e))

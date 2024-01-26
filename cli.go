@@ -8,18 +8,6 @@ import (
 	"strings"
 )
 
-type columnWidth struct {
-	desc  int
-	left  int
-	long  int
-	short int
-}
-
-type section struct {
-	text  string
-	title string
-}
-
 // ExitStatus sets the description of the program exit status.
 func ExitStatus(text ...string) {
 	exitStatus = strings.Join(text, " ")
@@ -66,97 +54,7 @@ func Flag(args ...any) {
 
 	flags = append(flags, f)
 	f.enable()
-	updateMaxWidth(f)
-}
-
-func flagToString(f *cliFlag) string {
-	var enoughRoom = ((TabWidth + colWidth.left) <= (MaxWidth / 2))
-	var fillto int
-	var lines []string
-	var str string
-
-	// Leading space
-	for i := 0; i < TabWidth; i++ {
-		str += " "
-	}
-
-	// Flags
-	str += getFlagColumn(f, Align && enoughRoom)
-
-	// Description
-	if Align && enoughRoom {
-		// Filler
-		fillto = TabWidth + colWidth.left - len(str)
-		for i := 0; i < fillto; i++ {
-			str += " "
-		}
-
-		lines = wrap(f.desc, colWidth.desc)
-		for i, line := range lines {
-			if i > 0 {
-				// Leading space plus filler
-				for j := 0; j < (TabWidth + colWidth.left); j++ {
-					str += " "
-				}
-			}
-
-			// Alignment
-			for j := 0; j < TabWidth; j++ {
-				str += " "
-			}
-
-			// Actual description
-			str += line + "\n"
-		}
-	} else {
-		// New line b/c colWidth.left is too big
-		str += "\n"
-
-		lines = wrap(f.desc, MaxWidth-(2*TabWidth))
-		for _, line := range lines {
-			// Leading space plus filler
-			for i := 0; i < (2 * TabWidth); i++ {
-				str += " "
-			}
-
-			// Actual description
-			str += line + "\n"
-		}
-		str += "\n"
-	}
-
-	return str
-}
-
-func flagToTable(f *cliFlag) string {
-	var str string
-
-	// Option
-	if f.short != "" {
-		str += "`-" + f.short + "`"
-	}
-	if (f.short != "") && (f.long != "") {
-		str += ", "
-	}
-	if f.long != "" {
-		str += "`--" + f.long + "`"
-	}
-
-	// Separator
-	str += " | "
-
-	// Args
-	if f.thetype != "" {
-		str += "`" + f.thetype + "`"
-	}
-
-	// Separator
-	str += " | "
-
-	// Description
-	str += f.desc + "\n"
-
-	return str
+	f.updateMaxWidth()
 }
 
 func getAuthors(md bool) (ret string) {
@@ -267,47 +165,6 @@ func getExitStatus(md bool) (ret string) {
 	return
 }
 
-func getFlagColumn(f *cliFlag, align bool) string {
-	var fillto int
-	var sep string
-	var str string
-
-	// Short flag
-	if f.short != "" {
-		str += "-" + f.short
-		if (f.thetype != "") && (f.long == "") {
-			str += " " + f.thetype
-		}
-	}
-
-	// Separator
-	sep = "  "
-	if (f.short != "") && (f.long != "") {
-		sep = ", "
-	}
-	if f.short != "" {
-		str += sep
-	}
-
-	// Alignment
-	if align {
-		fillto = colWidth.short + len(sep) - len(str)
-		for i := 0; i < fillto; i++ {
-			str += " "
-		}
-	}
-
-	// Long flag
-	if f.long != "" {
-		str += "--" + f.long
-		if f.thetype != "" {
-			str += "=" + f.thetype
-		}
-	}
-
-	return str
-}
-
 func getSeeAlso(md bool) (ret string) {
 	if len(SeeAlso) > 0 {
 		if md {
@@ -363,7 +220,7 @@ func PrintDefaults() {
 
 	for _, f := range flags {
 		if !f.hidden {
-			fmt.Fprint(os.Stderr, flagToString(f))
+			fmt.Fprint(os.Stderr, f.String())
 		}
 	}
 	if Align {
@@ -441,7 +298,7 @@ func Readme() {
 	readme += "------ | ---- | -----------\n"
 	for _, f := range flags {
 		if !f.hidden {
-			readme += flagToTable(f)
+			readme += f.table()
 		}
 	}
 
@@ -467,40 +324,6 @@ func Section(title string, text ...string) {
 	)
 }
 
-func updateMaxWidth(f *cliFlag) {
-	var sw = 2
-	var lw = 0
-	var dw int
-
-	if (f.short != "") && (f.long == "") {
-		sw += len(f.thetype)
-		if f.thetype != "" {
-			sw++
-		}
-	}
-
-	if f.long != "" {
-		lw = 2 + len(f.long) + len(f.thetype)
-		if f.thetype != "" {
-			lw++
-		}
-	}
-
-	dw = MaxWidth - TabWidth - sw - 2 - lw - TabWidth
-
-	if sw > colWidth.short {
-		colWidth.short = sw
-	}
-	if lw > colWidth.long {
-		colWidth.long = lw
-	}
-	if dw < colWidth.desc {
-		colWidth.desc = dw
-	}
-
-	colWidth.left = colWidth.short + 2 + colWidth.long
-}
-
 // Usage will essentially print a manpage.
 func Usage(status int) {
 	PrintHeader()
@@ -512,7 +335,7 @@ func Usage(status int) {
 func wrap(input string, width int) []string {
 	var line string
 	var lines []string
-	var strs = strings.Split(input, "\n")
+	var strs []string = strings.Split(input, "\n")
 	var words []string
 
 	for _, str := range strs {

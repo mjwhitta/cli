@@ -18,7 +18,7 @@ func (c *Counter) IsBoolFlag() bool {
 	return true // Allow shorthand
 }
 
-// String will convert Counter to a string.
+// String will return a string representation of the Counter.
 func (c *Counter) String() string {
 	return fmt.Sprintf("%d", c)
 }
