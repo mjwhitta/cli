@@ -64,7 +64,18 @@ func init() {
 		"fermentum lorem, non convallis enim urna rutrum mauris.\n\n",
 		"Duis in scelerisque mauris.",
 	)
-	cli.SeeAlso = []string{"flag"}
+	cli.SeeAlso = []string{
+		"example1",
+		"example2",
+		"example3",
+		"example4",
+		"example5",
+		"example6",
+		"example7",
+		"example8",
+		"example9",
+		"example10",
+	}
 	cli.TabWidth = 4 // Defaults to 4
 	cli.Title = "Sample README.md"
 

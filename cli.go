@@ -166,22 +166,29 @@ func getExitStatus(md bool) (ret string) {
 }
 
 func getSeeAlso(md bool) (ret string) {
-	if len(SeeAlso) > 0 {
-		if md {
-			ret += "\n## See also\n\n"
+	var tmp string
 
-			for _, see := range SeeAlso {
-				ret += see + "\n"
-			}
-		} else {
-			ret += "\nSEE ALSO\n"
+	if len(SeeAlso) == 0 {
+		return
+	}
 
-			for _, see := range SeeAlso {
-				for i := 0; i < TabWidth; i++ {
-					ret += " "
-				}
-				ret += see + "\n"
+	tmp = strings.Join(SeeAlso, ", ")
+
+	if md {
+		ret += "\n## See also\n\n"
+
+		for _, ln := range wrap(tmp, MaxWidth) {
+			ret += ln + "\n"
+		}
+	} else {
+		ret += "\nSEE ALSO\n"
+
+		for _, ln := range wrap(tmp, MaxWidth) {
+			for i := 0; i < TabWidth; i++ {
+				ret += " "
 			}
+
+			ret += ln + "\n"
 		}
 	}
 

@@ -84,4 +84,4 @@ var TabWidth int = 4
 var Title string
 
 // Version is the package version.
-const Version = "1.12.1"
+const Version = "1.12.2"
