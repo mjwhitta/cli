@@ -32,7 +32,7 @@ var (
 	flags      []*cliFlag
 	help       bool
 	info       string
-	less       = func(i, j int) bool {
+	less       func(i int, j int) bool = func(i int, j int) bool {
 		var left string = flags[i].long
 		var right string = flags[j].long
 
@@ -84,4 +84,4 @@ var TabWidth int = 4
 var Title string
 
 // Version is the package version.
-const Version = "1.12.2"
+const Version = "1.12.3"
