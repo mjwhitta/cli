@@ -22,6 +22,18 @@ func NFlag() int {
 	return flag.NFlag()
 }
 
+// Parse will run flag.Parse() and then check for the --help or
+// --readme flags.
+func Parse() {
+	flag.Parse()
+	if help {
+		Usage(0)
+	}
+	if readme {
+		Readme()
+	}
+}
+
 // Parsed wraps flag.Parsed().
 func Parsed() bool {
 	return flag.Parsed()

@@ -117,25 +117,8 @@ func getBugEmail(md bool) (ret string) {
 
 func getCustomSections(md bool) (ret string) {
 	for _, s := range sections {
-		if md {
-			ret += "\n## " + s.title + "\n\n"
-
-			for _, line := range wrap(s.text, MaxWidth) {
-				ret += line + "\n"
-			}
-		} else {
-			ret += s.title + "\n"
-
-			for _, line := range wrap(s.text, MaxWidth-TabWidth) {
-				for i := 0; i < TabWidth; i++ {
-					ret += " "
-				}
-
-				ret += line + "\n"
-			}
-
-			ret += "\n"
-		}
+		s.md = md
+		ret += s.String()
 	}
 
 	return
@@ -204,18 +187,6 @@ func init() {
 	flag.Usage = func() { Usage(127) }
 	Flag(&help, "h", "help", false, "Display this help message.")
 	Flag(&readme, "readme", false, "Autogenerate README.md.", true)
-}
-
-// Parse will run flag.Parse() and then check for the --help or
-// --readme flags.
-func Parse() {
-	flag.Parse()
-	if help {
-		Usage(0)
-	}
-	if readme {
-		Readme()
-	}
 }
 
 // PrintDefaults will print the configured flags for Usage(). It
@@ -327,6 +298,19 @@ func Section(title string, text ...string) {
 		section{
 			text:  strings.Join(text, " "),
 			title: title,
+		},
+	)
+}
+
+// SectionAligned will add a new custom section with the specified
+// title and text.
+func SectionAligned(title string, align string, text ...string) {
+	sections = append(
+		sections,
+		section{
+			alignOn: align,
+			text:    strings.Join(text, " "),
+			title:   title,
 		},
 	)
 }

@@ -60,9 +60,20 @@ func init() {
 		"rhoncus arcu.\n\n",
 		"Ut velit dui, aliquet eget tellus eget, commodo auctor",
 		"enim.\n\n",
-		"Duis blandit, metus vitae sagittis vestibulum, diam nisl",
+		"Blandit, metus vitae sagittis vestibulum, diam nisl",
 		"fermentum lorem, non convallis enim urna rutrum mauris.\n\n",
 		"Duis in scelerisque mauris.",
+	)
+	cli.SectionAligned(
+		"CUSTOM SECTION ALIGNED EXAMPLE",
+		"|",
+		"nunc|Lectus metus, consectetur et tellus tempus, accumsan",
+		"rhoncus arcu.\n",
+		"ut|Velit dui, aliquet eget tellus eget, commodo auctor",
+		"enim.\n",
+		"blandit|Metus vitae sagittis vestibulum, diam nisl",
+		"fermentum lorem, non convallis enim urna rutrum mauris.\n",
+		"duis|In scelerisque mauris.",
 	)
 	cli.SeeAlso = []string{
 		"example1",
