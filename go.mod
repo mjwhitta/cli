@@ -1,5 +1,5 @@
 module github.com/mjwhitta/cli
 
-go 1.19
+go 1.22
 
-require github.com/mjwhitta/errors v1.0.3
+require github.com/mjwhitta/errors v1.0.4
