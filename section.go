@@ -46,7 +46,7 @@ func (s section) String() (ret string) {
 				line = strings.TrimSpace(line)
 
 				key, val, _ = strings.Cut(line, s.alignOn)
-				wrapped = wrap(val, MaxWidth-TabWidth-len(key)-4)
+				wrapped = wrap(val, MaxWidth-TabWidth-max-4)
 
 				for i, line := range wrapped {
 					for j := 0; j < TabWidth; j++ {
