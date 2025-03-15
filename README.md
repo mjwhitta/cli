@@ -19,7 +19,7 @@ $ go get -u github.com/mjwhitta/cli
 
 ## Usage
 
-See the [example](cmd/example) for an in-depth usage. Below is a
+See the [example](example/main.go) for an in-depth usage. Below is a
 sample usage to create simple main package:
 
 ```
