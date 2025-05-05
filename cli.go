@@ -69,7 +69,7 @@ func getAuthors(md bool) (ret string) {
 			ret += "AUTHORS\n"
 
 			for _, author := range Authors {
-				for i := 0; i < TabWidth; i++ {
+				for range TabWidth {
 					ret += " "
 				}
 
@@ -103,7 +103,7 @@ func getBugEmail(md bool) (ret string) {
 			ret += "\nBUG REPORTS\n"
 
 			for _, line := range lines {
-				for i := 0; i < TabWidth; i++ {
+				for range TabWidth {
 					ret += " "
 				}
 
@@ -136,7 +136,7 @@ func getExitStatus(md bool) (ret string) {
 			ret += "\nEXIT STATUS\n"
 
 			for _, line := range wrap(exitStatus, MaxWidth-TabWidth) {
-				for i := 0; i < TabWidth; i++ {
+				for range TabWidth {
 					ret += " "
 				}
 
@@ -167,7 +167,7 @@ func getSeeAlso(md bool) (ret string) {
 		ret += "\nSEE ALSO\n"
 
 		for _, ln := range wrap(tmp, MaxWidth) {
-			for i := 0; i < TabWidth; i++ {
+			for range TabWidth {
 				ret += " "
 			}
 
@@ -233,7 +233,7 @@ func PrintHeader() {
 
 	lines = wrap(info, MaxWidth-TabWidth)
 	for _, line := range lines {
-		for j := 0; j < TabWidth; j++ {
+		for range TabWidth {
 			header += " "
 		}
 		header += line + "\n"

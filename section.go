@@ -26,7 +26,7 @@ func (s section) String() (ret string) {
 
 		if s.alignOn == "" {
 			for _, line := range wrap(s.text, MaxWidth-TabWidth) {
-				for i := 0; i < TabWidth; i++ {
+				for range TabWidth {
 					ret += " "
 				}
 
@@ -49,22 +49,22 @@ func (s section) String() (ret string) {
 				wrapped = wrap(val, MaxWidth-TabWidth-max-4)
 
 				for i, line := range wrapped {
-					for j := 0; j < TabWidth; j++ {
+					for range TabWidth {
 						ret += " "
 					}
 
 					if i == 0 {
 						ret += key
-						for j := 0; j < max-len(key); j++ {
+						for range max - len(key) {
 							ret += " "
 						}
 					} else {
-						for j := 0; j < max; j++ {
+						for range max {
 							ret += " "
 						}
 					}
 
-					for j := 0; j < TabWidth; j++ {
+					for range TabWidth {
 						ret += " "
 					}
 
