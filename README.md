@@ -28,7 +28,6 @@ package main
 import (
     "fmt"
     "os"
-    "strings"
 
     "github.com/mjwhitta/cli"
 )
@@ -44,14 +43,11 @@ func init() {
     cli.Align = true // Defaults to false
     cli.Authors = []string{"Your Name <your@email.tld>"}
     cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
-    cli.ExitStatus = strings.Join(
-        []string{
-            "Normally the exit status is 0. In the event of an",
-            "error, the exit status will be 1.",
-        },
-        " ",
+    cli.ExitStatus(
+        "Normally the exit status is 0. In the event of an error the",
+        "exit status will be 1.",
     )
-    cli.Info = "Lorem ipsum dolor sit amet, consectetur adipiscing"
+    cli.Info("Lorem ipsum dolor sit amet, consectetur adipiscing")
 
     // Parse cli flags
     cli.Flag(&flags.aBool, "b", "bool", false, "Sample boolean flag.")
