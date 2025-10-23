@@ -31,6 +31,7 @@ func (list *FloatList) Set(val string) error {
 	}
 
 	(*list) = append(*list, v)
+
 	return nil
 }
 
@@ -57,6 +58,7 @@ func (list *IntList) Set(val string) error {
 	}
 
 	(*list) = append(*list, v)
+
 	return nil
 }
 
@@ -76,6 +78,7 @@ func (list *StringList) String() string {
 // Set will append a string to a StringList.
 func (list *StringList) Set(val string) error {
 	(*list) = append(*list, val)
+
 	return nil
 }
 
@@ -102,5 +105,6 @@ func (list *UintList) Set(val string) error {
 	}
 
 	(*list) = append(*list, v)
+
 	return nil
 }

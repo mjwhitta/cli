@@ -8,7 +8,7 @@ import (
 )
 
 // Version is the package version.
-const Version string = "1.13.0"
+const Version string = "1.13.1"
 
 var (
 	// Align determines if short and long cli flags are aligned or

@@ -61,7 +61,7 @@ func generateFuncs(t string) string {
 		ret += "\t(*list) = append(*list, val)\n"
 	}
 
-	ret += "\treturn nil\n"
+	ret += "\n\treturn nil\n"
 	ret += "}\n"
 
 	return ret
