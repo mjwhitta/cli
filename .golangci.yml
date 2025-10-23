@@ -208,6 +208,7 @@ linters:
       disable:
         - decl
         - defer
+        - err
 run:
   build-tags: []
   concurrency: 0
