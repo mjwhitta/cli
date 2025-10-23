@@ -34,7 +34,7 @@ func init() {
 	// Configure cli package
 	cli.Align = true // Defaults to false
 	cli.Authors = []string{"Miles Whittaker <mj@whitta.dev>"}
-	cli.Banner = fmt.Sprintf("%s [OPTIONS] <arg>", os.Args[0])
+	cli.Banner = os.Args[0] + " [OPTIONS] <arg>"
 	cli.BugEmail = "cli.bugs@whitta.dev"
 	cli.ExitStatus(
 		"Normally the exit status is 0. In the event of an error the",
@@ -102,11 +102,12 @@ func init() {
 	cli.Parse()
 
 	// Validate cli args
-	if cli.NArg() == 0 {
+	switch {
+	case cli.NArg() == 0:
 		cli.Usage(MissingArgument)
-	} else if cli.NArg() > 1 {
+	case cli.NArg() > 1:
 		cli.Usage(ExtraArgument)
-	} else if flags.aString == "" {
+	case flags.aString == "":
 		cli.Usage(MissingOption)
 	}
 }
@@ -121,22 +122,12 @@ func main() {
 		len(flags.anIntList),
 		flags.anIntList,
 	)
-	fmt.Printf(
-		"IntList: %d - %s\n",
-		len(flags.anIntList),
-		flags.anIntList.String(),
-	)
 	fmt.Printf("string: %s\n", flags.aString)
 	fmt.Printf(
 		"StringList: %d - %v\n",
 		len(flags.aStringList),
 		flags.aStringList,
 	)
-	fmt.Printf(
-		"StringList: %d - %s\n",
-		len(flags.aStringList),
-		flags.aStringList.String(),
-	)
 	fmt.Printf("uint: %d\n", flags.aUint)
-	fmt.Printf("args: %d - %s\n", cli.NArg(), cli.Args())
+	fmt.Printf("args: %d - %v\n", cli.NArg(), cli.Args())
 }

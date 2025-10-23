@@ -55,173 +55,141 @@ func newFlag(args ...any) (*cliFlag, error) {
 func (f *cliFlag) column(align bool) string {
 	var fillto int
 	var sep string
-	var str string
+	var s string
 
 	// Short flag
 	if f.short != "" {
-		str += "-" + f.short
+		s += "-" + f.short
 		if (f.thetype != "") && (f.long == "") {
-			str += " " + f.thetype
+			s += " " + f.thetype
 		}
 	}
 
 	// Separator
 	sep = "  "
-	if (f.short != "") && (f.long != "") {
-		sep = ", "
-	}
+
 	if f.short != "" {
-		str += sep
+		if f.long != "" {
+			sep = ", "
+		}
+
+		s += sep
 	}
 
 	// Alignment
 	if align {
-		fillto = colWidth.short + len(sep) - len(str)
-		for i := 0; i < fillto; i++ {
-			str += " "
+		fillto = colWidth.short + len(sep) - len(s)
+		for range fillto {
+			s += " "
 		}
 	}
 
 	// Long flag
 	if f.long != "" {
-		str += "--" + f.long
+		s += "--" + f.long
 		if f.thetype != "" {
-			str += "=" + f.thetype
+			s += "=" + f.thetype
 		}
 	}
 
-	return str
+	return s
 }
 
-func (f *cliFlag) enable() {
-	f.enableShort()
-	f.enableLong()
-}
-
-func (f *cliFlag) enableLong() {
-	if f.long == "" {
-		return
+//nolint:cyclop,gocyclo // sometimes ugly is necessary
+func (f *cliFlag) enable(s string) error {
+	if s == "" {
+		return nil
 	}
 
-	switch f.ptr.(type) {
+	switch ptr := f.ptr.(type) {
 	case *bool:
-		flag.BoolVar(f.ptr.(*bool), f.long, f.val.(bool), f.desc)
-	case *Counter:
-		flag.Var(f.ptr.(*Counter), f.long, f.desc)
-	case *float64:
-		flag.Float64Var(
-			f.ptr.(*float64),
-			f.long,
-			f.val.(float64),
-			f.desc,
-		)
-	case *FloatList:
-		flag.Var(f.ptr.(*FloatList), f.long, f.desc)
-	case *int:
-		flag.IntVar(f.ptr.(*int), f.long, f.val.(int), f.desc)
-	case *int64:
-		flag.Int64Var(
-			f.ptr.(*int64),
-			f.long,
-			int64(f.val.(int)),
-			f.desc,
-		)
-	case *IntList:
-		flag.Var(f.ptr.(*IntList), f.long, f.desc)
-	case *string:
-		flag.StringVar(
-			f.ptr.(*string),
-			f.long,
-			f.val.(string),
-			f.desc,
-		)
-	case *StringList:
-		flag.Var(f.ptr.(*StringList), f.long, f.desc)
-	case *uint:
-		flag.UintVar(f.ptr.(*uint), f.long, uint(f.val.(int)), f.desc)
-	case *uint64:
-		flag.Uint64Var(
-			f.ptr.(*uint64),
-			f.long,
-			uint64(f.val.(int)),
-			f.desc,
-		)
-	case *UintList:
-		flag.Var(f.ptr.(*UintList), f.long, f.desc)
-	}
-}
+		if val, ok := f.val.(bool); ok {
+			flag.BoolVar(ptr, s, val, f.desc)
+			break
+		}
 
-func (f *cliFlag) enableShort() {
-	if f.short == "" {
-		return
+		return errors.Newf("invalid bool %v", f.val)
+	case *Counter:
+		flag.Var(ptr, s, f.desc)
+	case *float64:
+		if val, ok := f.val.(float64); ok {
+			flag.Float64Var(ptr, s, val, f.desc)
+			break
+		}
+
+		return errors.Newf("invalid float64 %v", f.val)
+	case *FloatList:
+		flag.Var(ptr, s, f.desc)
+	case *int:
+		if val, ok := f.val.(int); ok {
+			flag.IntVar(ptr, s, val, f.desc)
+			break
+		}
+
+		return errors.Newf("invalid int %v", f.val)
+	case *int64:
+		if val, ok := f.val.(int64); ok {
+			flag.Int64Var(ptr, s, val, f.desc)
+			break
+		}
+
+		return errors.Newf("invalid int64 %v", f.val)
+	case *IntList:
+		flag.Var(ptr, s, f.desc)
+	case *string:
+		if val, ok := f.val.(string); ok {
+			flag.StringVar(ptr, s, val, f.desc)
+			break
+		}
+
+		return errors.Newf("invalid string %v", f.val)
+	case *StringList:
+		flag.Var(ptr, s, f.desc)
+	case *uint:
+		if val, ok := f.val.(int); ok {
+			if val < 0 {
+				return errors.Newf("invalid uint %v", val)
+			}
+
+			flag.UintVar(ptr, s, uint(val), f.desc)
+
+			break
+		}
+
+		return errors.Newf("invalid uint %v", f.val)
+	case *uint64:
+		if val, ok := f.val.(int64); ok {
+			if val < 0 {
+				return errors.Newf("invalid uint64 %v", val)
+			}
+
+			flag.Uint64Var(ptr, s, uint64(val), f.desc)
+
+			break
+		}
+
+		return errors.Newf("invalid uint64 %v", f.val)
+	case *UintList:
+		flag.Var(ptr, s, f.desc)
 	}
 
-	switch f.ptr.(type) {
-	case *bool:
-		flag.BoolVar(f.ptr.(*bool), f.short, f.val.(bool), f.desc)
-	case *Counter:
-		flag.Var(f.ptr.(*Counter), f.short, f.desc)
-	case *float64:
-		flag.Float64Var(
-			f.ptr.(*float64),
-			f.short,
-			f.val.(float64),
-			f.desc,
-		)
-	case *FloatList:
-		flag.Var(f.ptr.(*FloatList), f.short, f.desc)
-	case *int:
-		flag.IntVar(f.ptr.(*int), f.short, f.val.(int), f.desc)
-	case *int64:
-		flag.Int64Var(
-			f.ptr.(*int64),
-			f.short,
-			int64(f.val.(int)),
-			f.desc,
-		)
-	case *IntList:
-		flag.Var(f.ptr.(*IntList), f.short, f.desc)
-	case *string:
-		flag.StringVar(
-			f.ptr.(*string),
-			f.short,
-			f.val.(string),
-			f.desc,
-		)
-	case *StringList:
-		flag.Var(f.ptr.(*StringList), f.short, f.desc)
-	case *uint:
-		flag.UintVar(
-			f.ptr.(*uint),
-			f.short,
-			uint(f.val.(int)),
-			f.desc,
-		)
-	case *uint64:
-		flag.Uint64Var(
-			f.ptr.(*uint64),
-			f.short,
-			uint64(f.val.(int)),
-			f.desc,
-		)
-	case *UintList:
-		flag.Var(f.ptr.(*UintList), f.short, f.desc)
-	}
+	return nil
 }
 
 func (f *cliFlag) processString(arg string) {
 	var validLong bool = !f.gotVal && !strings.Contains(arg, " ")
 
-	if f.desc != "" {
+	switch {
+	case f.desc != "":
 		f.desc += " " + strings.TrimSpace(arg)
-	} else if (f.short == "") && (len(arg) == 1) {
+	case (f.short == "") && (len(arg) == 1):
 		f.short = strings.TrimSpace(arg)
-	} else if (f.long == "") && (len(arg) > 1) && validLong {
+	case (f.long == "") && (len(arg) > 1) && validLong:
 		f.long = strings.TrimSpace(arg)
-	} else if !f.isList && (f.val == nil) {
+	case !f.isList && (f.val == nil):
 		f.gotVal = true
 		f.val = arg
-	} else {
+	default:
 		f.desc = strings.TrimSpace(arg)
 	}
 }
@@ -241,93 +209,98 @@ func (f *cliFlag) setType() {
 
 // String will return a string representation of the cliFlag.
 func (f *cliFlag) String() string {
+	//nolint:mnd // 2 is not a magic number
 	var enoughRoom bool = (TabWidth + colWidth.left) <= (MaxWidth / 2)
 	var fillto int
 	var lines []string
-	var str string
+	var s string
 
 	// Leading space
-	for i := 0; i < TabWidth; i++ {
-		str += " "
+	for range TabWidth {
+		s += " "
 	}
 
 	// Flags
-	str += f.column(Align && enoughRoom)
+	s += f.column(Align && enoughRoom)
 
 	// Description
 	if Align && enoughRoom {
 		// Filler
-		fillto = TabWidth + colWidth.left - len(str)
-		for i := 0; i < fillto; i++ {
-			str += " "
+		fillto = TabWidth + colWidth.left - len(s)
+		for range fillto {
+			s += " "
 		}
 
 		lines = wrap(f.desc, colWidth.desc)
 		for i, line := range lines {
 			if i > 0 {
 				// Leading space plus filler
-				for j := 0; j < (TabWidth + colWidth.left); j++ {
-					str += " "
+				for range TabWidth + colWidth.left {
+					s += " "
 				}
 			}
 
 			// Alignment
-			for j := 0; j < TabWidth; j++ {
-				str += " "
+			for range TabWidth {
+				s += " "
 			}
 
 			// Actual description
-			str += line + "\n"
+			s += line + "\n"
 		}
 	} else {
 		// New line b/c colWidth.left is too big
-		str += "\n"
+		s += "\n"
 
+		//nolint:mnd // 2 is not a magic number
 		lines = wrap(f.desc, MaxWidth-(2*TabWidth))
 		for _, line := range lines {
 			// Leading space plus filler
-			for i := 0; i < (2 * TabWidth); i++ {
-				str += " "
+			for range 2 * TabWidth {
+				s += " "
 			}
 
 			// Actual description
-			str += line + "\n"
+			s += line + "\n"
 		}
-		str += "\n"
+
+		s += "\n"
 	}
 
-	return str
+	return s
 }
 
 func (f *cliFlag) table() string {
-	var str string
+	var s string
 
 	// Option
 	if f.short != "" {
-		str += "`-" + f.short + "`"
+		s += "`-" + f.short + "`"
+
+		if f.long != "" {
+			s += ", "
+		}
 	}
-	if (f.short != "") && (f.long != "") {
-		str += ", "
-	}
+
 	if f.long != "" {
-		str += "`--" + f.long + "`"
+		s += "`--" + f.long + "`"
 	}
 
 	// Separator
-	str += " | "
+	s += " | "
 
 	// Args
 	if f.thetype != "" {
-		str += "`" + f.thetype + "`"
+		s += "`" + f.thetype + "`"
 	}
 
 	// Separator
-	str += " | "
+	s += " | "
 
 	// Description
-	str += f.desc + "\n"
+	s += f.desc + "\n"
 
-	return str
+	return s
 }
 
 func (f *cliFlag) updateMaxWidth() {
@@ -337,6 +310,7 @@ func (f *cliFlag) updateMaxWidth() {
 	var sw int = 2
 
 	if f.long != "" {
+		//nolint:mnd // 2 is not a magic number
 		lw = 2 + len(f.long) + len(f.thetype)
 
 		if f.thetype != "" {

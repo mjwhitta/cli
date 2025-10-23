@@ -26,9 +26,11 @@ func NFlag() int {
 // --readme flags.
 func Parse() {
 	flag.Parse()
+
 	if help {
 		Usage(0)
 	}
+
 	if readme {
 		Readme()
 	}

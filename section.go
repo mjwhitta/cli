@@ -9,9 +9,10 @@ type section struct {
 	title   string
 }
 
+// String will return a string representation of the section.
 func (s section) String() (ret string) {
 	var key string
-	var max int
+	var keyMaxLen int
 	var val string
 	var wrapped []string
 
@@ -37,8 +38,8 @@ func (s section) String() (ret string) {
 				line = strings.TrimSpace(line)
 				key, _, _ = strings.Cut(line, s.alignOn)
 
-				if len(key) > max {
-					max = len(key)
+				if len(key) > keyMaxLen {
+					keyMaxLen = len(key)
 				}
 			}
 
@@ -46,7 +47,8 @@ func (s section) String() (ret string) {
 				line = strings.TrimSpace(line)
 
 				key, val, _ = strings.Cut(line, s.alignOn)
-				wrapped = wrap(val, MaxWidth-TabWidth-max-4)
+				//nolint:mnd // 4 is not a magic number
+				wrapped = wrap(val, MaxWidth-TabWidth-keyMaxLen-4)
 
 				for i, line := range wrapped {
 					for range TabWidth {
@@ -55,11 +57,11 @@ func (s section) String() (ret string) {
 
 					if i == 0 {
 						ret += key
-						for range max - len(key) {
+						for range keyMaxLen - len(key) {
 							ret += " "
 						}
 					} else {
-						for range max {
+						for range keyMaxLen {
 							ret += " "
 						}
 					}

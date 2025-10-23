@@ -24,6 +24,6 @@ func (c *Counter) String() string {
 }
 
 // Set will call Inc().
-func (c *Counter) Set(val string) error {
+func (c *Counter) Set(_ string) error {
 	return c.Inc()
 }

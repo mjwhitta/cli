@@ -16,10 +16,12 @@ func generateFuncs(t string) string {
 	ret += "\n// " + tn + " allows setting a value multiple times, as"
 	ret += " in:\n// --flag=" + t + "1 --flag=" + t + "2\n"
 	ret += "type " + tn + " []" + t
+
 	switch t {
 	case "float", "int", "uint":
 		ret += "64"
 	}
+
 	ret += "\n\n"
 
 	// String() func
@@ -35,6 +37,7 @@ func generateFuncs(t string) string {
 	// Set() func
 	ret += "// Set will append a " + t + " to a " + tn + ".\n"
 	ret += "func (list *" + tn + ") Set(val string) error {\n"
+
 	switch t {
 	case "float":
 		ret += "\tvar e error\n"
@@ -57,6 +60,7 @@ func generateFuncs(t string) string {
 	case "string":
 		ret += "\t(*list) = append(*list, val)\n"
 	}
+
 	ret += "\treturn nil\n"
 	ret += "}\n"
 
@@ -75,12 +79,6 @@ func header() string {
 }
 
 func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			panic(r.(error).Error())
-		}
-	}()
-
 	var e error
 	var f *os.File
 	var fn string = "generated.go"
@@ -89,7 +87,11 @@ func main() {
 	if f, e = os.Create(fn); e != nil {
 		panic(errors.Newf("failed to create %s: %w", fn, e))
 	}
-	defer f.Close()
+	defer func() {
+		if e := f.Close(); e != nil {
+			panic(e)
+		}
+	}()
 
 	_, _ = f.WriteString(header())
 

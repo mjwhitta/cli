@@ -44,11 +44,12 @@ func init() {
 	flag.Parse()
 
 	// Validate cli args
-	if flag.NArg() == 0 {
+	switch {
+	case flag.NArg() == 0:
 		os.Exit(MissingArgument)
-	} else if flag.NArg() > 1 {
+	case flag.NArg() > 1:
 		os.Exit(ExtraArgument)
-	} else if flags.aString == "" {
+	case flags.aString == "":
 		os.Exit(MissingOption)
 	}
 }

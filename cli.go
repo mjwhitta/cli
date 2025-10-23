@@ -36,6 +36,7 @@ func ExitStatus(text ...string) {
 //	)
 func Flag(args ...any) {
 	var e error
+	var exit int = 128
 	var f *cliFlag
 
 	if len(args) == 0 {
@@ -44,16 +45,26 @@ func Flag(args ...any) {
 
 	if f, e = newFlag(args...); e != nil {
 		fmt.Fprintln(os.Stderr, e.Error())
-		os.Exit(127)
+		os.Exit(exit)
 	}
 
 	if e = f.validate(); e != nil {
 		fmt.Fprintln(os.Stderr, e.Error())
-		os.Exit(128)
+		os.Exit(exit)
 	}
 
 	flags = append(flags, f)
-	f.enable()
+
+	if e = f.enable(f.short); e != nil {
+		fmt.Fprintln(os.Stderr, e.Error())
+		os.Exit(exit)
+	}
+
+	if e = f.enable(f.long); e != nil {
+		fmt.Fprintln(os.Stderr, e.Error())
+		os.Exit(exit)
+	}
+
 	f.updateMaxWidth()
 }
 
@@ -78,7 +89,7 @@ func getAuthors(md bool) (ret string) {
 		}
 	}
 
-	return
+	return ret
 }
 
 func getBugEmail(md bool) (ret string) {
@@ -112,7 +123,7 @@ func getBugEmail(md bool) (ret string) {
 		}
 	}
 
-	return
+	return ret
 }
 
 func getCustomSections(md bool) (ret string) {
@@ -121,7 +132,7 @@ func getCustomSections(md bool) (ret string) {
 		ret += s.String()
 	}
 
-	return
+	return ret
 }
 
 func getExitStatus(md bool) (ret string) {
@@ -145,14 +156,14 @@ func getExitStatus(md bool) (ret string) {
 		}
 	}
 
-	return
+	return ret
 }
 
 func getSeeAlso(md bool) (ret string) {
 	var tmp string
 
 	if len(SeeAlso) == 0 {
-		return
+		return ret
 	}
 
 	tmp = strings.Join(SeeAlso, ", ")
@@ -175,7 +186,7 @@ func getSeeAlso(md bool) (ret string) {
 		}
 	}
 
-	return
+	return ret
 }
 
 // Info sets the description of how the program works.
@@ -184,7 +195,10 @@ func Info(text ...string) {
 }
 
 func init() {
-	flag.Usage = func() { Usage(127) }
+	var exit int = 127
+
+	flag.Usage = func() { Usage(exit) }
+
 	Flag(&help, "h", "help", false, "Display this help message.")
 	Flag(&readme, "readme", false, "Autogenerate README.md.", true)
 }
@@ -201,6 +215,7 @@ func PrintDefaults() {
 			fmt.Fprint(os.Stderr, f.String())
 		}
 	}
+
 	if Align {
 		fmt.Fprintln(os.Stderr)
 	}
@@ -222,20 +237,18 @@ func PrintExtra() {
 // PrintHeader will print the Usage() header.
 func PrintHeader() {
 	var header string
-	var lines []string
 
-	lines = wrap("Usage: "+Banner, MaxWidth)
-	for _, line := range lines {
+	for _, line := range wrap("Usage: "+Banner, MaxWidth) {
 		header += line + "\n"
 	}
 
 	header += "\nDESCRIPTION\n"
 
-	lines = wrap(info, MaxWidth-TabWidth)
-	for _, line := range lines {
+	for _, line := range wrap(info, MaxWidth-TabWidth) {
 		for range TabWidth {
 			header += " "
 		}
+
 		header += line + "\n"
 	}
 
@@ -247,7 +260,6 @@ func PrintHeader() {
 // Readme will attempt to print out a basic README.md file based on
 // the provided details.
 func Readme() {
-	var lines []string
 	var readme string
 
 	// Title
@@ -255,25 +267,28 @@ func Readme() {
 
 	// Synopsis
 	readme += "\n## Synopsis\n\n"
-	lines = wrap(Banner, MaxWidth)
-	for _, line := range lines {
+
+	for _, line := range wrap(Banner, MaxWidth) {
 		readme += "`" + line + "`\n"
 	}
 
 	// Description
 	readme += "\n## Description\n\n"
-	lines = wrap(info, MaxWidth)
-	for _, line := range lines {
+
+	for _, line := range wrap(info, MaxWidth) {
 		readme += line + "\n"
 	}
 
 	// Options and descriptions
 	readme += "\n## Options\n\n"
+
 	if !sort.SliceIsSorted(flags, less) {
 		sort.SliceStable(flags, less)
 	}
+
 	readme += "Option | Args | Description\n"
 	readme += "------ | ---- | -----------\n"
+
 	for _, f := range flags {
 		if !f.hidden {
 			readme += f.table()
@@ -334,12 +349,13 @@ func wrap(input string, width int) []string {
 		words = strings.Fields(str)
 
 		for _, word := range words {
-			if len(line)+len(word)+1 > width {
+			switch {
+			case len(line)+len(word)+1 > width:
 				lines = append(lines, line)
 				line = word
-			} else if line == "" {
+			case line == "":
 				line = word
-			} else {
+			default:
 				line += " " + word
 			}
 		}
