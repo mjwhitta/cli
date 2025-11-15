@@ -68,32 +68,35 @@ func Flag(args ...any) {
 	f.updateMaxWidth()
 }
 
-func getAuthors(md bool) (ret string) {
+func getAuthors(md bool) string {
+	var sb strings.Builder
+
 	if len(Authors) > 0 {
 		if md {
-			ret += "\n## Authors\n\n"
+			sb.WriteString("\n## Authors\n\n")
 
 			for _, author := range Authors {
-				ret += author + "\n"
+				sb.WriteString(author + "\n")
 			}
 		} else {
-			ret += "AUTHORS\n"
+			sb.WriteString("AUTHORS\n")
 
 			for _, author := range Authors {
 				for range TabWidth {
-					ret += " "
+					sb.WriteString(" ")
 				}
 
-				ret += author + "\n"
+				sb.WriteString(author + "\n")
 			}
 		}
 	}
 
-	return ret
+	return sb.String()
 }
 
-func getBugEmail(md bool) (ret string) {
+func getBugEmail(md bool) string {
 	var lines []string
+	var sb strings.Builder
 
 	if BugEmail != "" {
 		if md {
@@ -101,92 +104,99 @@ func getBugEmail(md bool) (ret string) {
 				"Email bug reports to <"+BugEmail+">.",
 				MaxWidth,
 			)
-			ret += "\n## Reporting bugs\n\n"
+
+			sb.WriteString("\n## Reporting bugs\n\n")
 
 			for _, line := range lines {
-				ret += line + "\n"
+				sb.WriteString(line + "\n")
 			}
 		} else {
 			lines = wrap(
 				"Email bug reports to <"+BugEmail+">.",
 				MaxWidth-TabWidth,
 			)
-			ret += "\nBUG REPORTS\n"
+
+			sb.WriteString("\nBUG REPORTS\n")
 
 			for _, line := range lines {
 				for range TabWidth {
-					ret += " "
+					sb.WriteString(" ")
 				}
 
-				ret += line + "\n"
+				sb.WriteString(line + "\n")
 			}
 		}
 	}
 
-	return ret
+	return sb.String()
 }
 
-func getCustomSections(md bool) (ret string) {
+func getCustomSections(md bool) string {
+	var sb strings.Builder
+
 	for _, s := range sections {
 		s.md = md
-		ret += s.String()
+		sb.WriteString(s.String())
 	}
 
-	return ret
+	return sb.String()
 }
 
-func getExitStatus(md bool) (ret string) {
+func getExitStatus(md bool) string {
+	var sb strings.Builder
+
 	if exitStatus != "" {
 		if md {
-			ret += "\n## Exit status\n\n"
+			sb.WriteString("\n## Exit status\n\n")
 
 			for _, line := range wrap(exitStatus, MaxWidth) {
-				ret += line + "\n"
+				sb.WriteString(line + "\n")
 			}
 		} else {
-			ret += "\nEXIT STATUS\n"
+			sb.WriteString("\nEXIT STATUS\n")
 
 			for _, line := range wrap(exitStatus, MaxWidth-TabWidth) {
 				for range TabWidth {
-					ret += " "
+					sb.WriteString(" ")
 				}
 
-				ret += line + "\n"
+				sb.WriteString(line + "\n")
 			}
 		}
 	}
 
-	return ret
+	return sb.String()
 }
 
-func getSeeAlso(md bool) (ret string) {
+func getSeeAlso(md bool) string {
+	var sb strings.Builder
 	var tmp string
 
 	if len(SeeAlso) == 0 {
-		return ret
+		return ""
 	}
 
 	tmp = strings.Join(SeeAlso, ", ")
 
 	if md {
-		ret += "\n## See also\n\n"
+		sb.WriteString("\n## See also\n\n")
 
 		for _, ln := range wrap(tmp, MaxWidth) {
-			ret += ln + "\n"
+			sb.WriteString(ln + "\n")
 		}
 	} else {
-		ret += "\nSEE ALSO\n"
+		sb.WriteString("\nSEE ALSO\n")
 
 		for _, ln := range wrap(tmp, MaxWidth) {
 			for range TabWidth {
-				ret += " "
+				sb.WriteString(" ")
 			}
 
-			ret += ln + "\n"
+			sb.WriteString(ln + "\n")
 		}
 	}
 
-	return ret
+	return sb.String()
 }
 
 // Info sets the description of how the program works.
@@ -236,72 +246,72 @@ func PrintExtra() {
 
 // PrintHeader will print the Usage() header.
 func PrintHeader() {
-	var header string
+	var sb strings.Builder
 
 	for _, line := range wrap("Usage: "+Banner, MaxWidth) {
-		header += line + "\n"
+		sb.WriteString(line + "\n")
 	}
 
-	header += "\nDESCRIPTION\n"
+	sb.WriteString("\nDESCRIPTION\n")
 
 	for _, line := range wrap(info, MaxWidth-TabWidth) {
 		for range TabWidth {
-			header += " "
+			sb.WriteString(" ")
 		}
 
-		header += line + "\n"
+		sb.WriteString(line + "\n")
 	}
 
-	header += "\nOPTIONS\n"
+	sb.WriteString("\nOPTIONS\n")
 
-	fmt.Fprint(os.Stderr, header)
+	fmt.Fprint(os.Stderr, sb.String())
 }
 
 // Readme will attempt to print out a basic README.md file based on
 // the provided details.
 func Readme() {
-	var readme string
+	var sb strings.Builder
 
 	// Title
-	readme += "# " + Title + "\n"
+	sb.WriteString("# " + Title + "\n")
 
 	// Synopsis
-	readme += "\n## Synopsis\n\n"
+	sb.WriteString("\n## Synopsis\n\n")
 
 	for _, line := range wrap(Banner, MaxWidth) {
-		readme += "`" + line + "`\n"
+		sb.WriteString("`" + line + "`\n")
 	}
 
 	// Description
-	readme += "\n## Description\n\n"
+	sb.WriteString("\n## Description\n\n")
 
 	for _, line := range wrap(info, MaxWidth) {
-		readme += line + "\n"
+		sb.WriteString(line + "\n")
 	}
 
 	// Options and descriptions
-	readme += "\n## Options\n\n"
+	sb.WriteString("\n## Options\n\n")
 
 	if !sort.SliceIsSorted(flags, less) {
 		sort.SliceStable(flags, less)
 	}
 
-	readme += "Option | Args | Description\n"
-	readme += "------ | ---- | -----------\n"
+	sb.WriteString("Option | Args | Description\n")
+	sb.WriteString("------ | ---- | -----------\n")
 
 	for _, f := range flags {
 		if !f.hidden {
-			readme += f.table()
+			sb.WriteString(f.table())
 		}
 	}
 
-	readme += getCustomSections(true)
-	readme += getAuthors(true)
-	readme += getBugEmail(true)
-	readme += getExitStatus(true)
-	readme += getSeeAlso(true)
+	sb.WriteString(getCustomSections(true))
+	sb.WriteString(getAuthors(true))
+	sb.WriteString(getBugEmail(true))
+	sb.WriteString(getExitStatus(true))
+	sb.WriteString(getSeeAlso(true))
 
-	fmt.Print(readme)
+	fmt.Print(sb.String())
 	os.Exit(0)
 }
 

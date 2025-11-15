@@ -54,14 +54,15 @@ func newFlag(args ...any) (*cliFlag, error) {
 
 func (f *cliFlag) column(align bool) string {
 	var fillto int
+	var sb strings.Builder
 	var sep string
-	var s string
 
 	// Short flag
 	if f.short != "" {
-		s += "-" + f.short
+		sb.WriteString("-" + f.short)
+
 		if (f.thetype != "") && (f.long == "") {
-			s += " " + f.thetype
+			sb.WriteString(" " + f.thetype)
 		}
 	}
 
@@ -73,26 +74,27 @@ func (f *cliFlag) column(align bool) string {
 			sep = ", "
 		}
 
-		s += sep
+		sb.WriteString(sep)
 	}
 
 	// Alignment
 	if align {
-		fillto = colWidth.short + len(sep) - len(s)
+		fillto = colWidth.short + len(sep) - sb.Len()
 		for range fillto {
-			s += " "
+			sb.WriteString(" ")
 		}
 	}
 
 	// Long flag
 	if f.long != "" {
-		s += "--" + f.long
+		sb.WriteString("--" + f.long)
+
 		if f.thetype != "" {
-			s += "=" + f.thetype
+			sb.WriteString("=" + f.thetype)
 		}
 	}
 
-	return s
+	return sb.String()
 }
 
 //nolint:cyclop,gocyclo // sometimes ugly is necessary
@@ -213,22 +215,22 @@ func (f *cliFlag) String() string {
 	var enoughRoom bool = (TabWidth + colWidth.left) <= (MaxWidth / 2)
 	var fillto int
 	var lines []string
-	var s string
+	var sb strings.Builder
 
 	// Leading space
 	for range TabWidth {
-		s += " "
+		sb.WriteString(" ")
 	}
 
 	// Flags
-	s += f.column(Align && enoughRoom)
+	sb.WriteString(f.column(Align && enoughRoom))
 
 	// Description
 	if Align && enoughRoom {
 		// Filler
-		fillto = TabWidth + colWidth.left - len(s)
+		fillto = TabWidth + colWidth.left - sb.Len()
 		for range fillto {
-			s += " "
+			sb.WriteString(" ")
 		}
 
 		lines = wrap(f.desc, colWidth.desc)
@@ -236,71 +238,71 @@ func (f *cliFlag) String() string {
 			if i > 0 {
 				// Leading space plus filler
 				for range TabWidth + colWidth.left {
-					s += " "
+					sb.WriteString(" ")
 				}
 			}
 
 			// Alignment
 			for range TabWidth {
-				s += " "
+				sb.WriteString(" ")
 			}
 
 			// Actual description
-			s += line + "\n"
+			sb.WriteString(line + "\n")
 		}
 	} else {
 		// New line b/c colWidth.left is too big
-		s += "\n"
+		sb.WriteString("\n")
 
 		//nolint:mnd // 2 is not a magic number
 		lines = wrap(f.desc, MaxWidth-(2*TabWidth))
 		for _, line := range lines {
 			// Leading space plus filler
 			for range 2 * TabWidth {
-				s += " "
+				sb.WriteString(" ")
 			}
 
 			// Actual description
-			s += line + "\n"
+			sb.WriteString(line + "\n")
 		}
 
-		s += "\n"
+		sb.WriteString("\n")
 	}
 
-	return s
+	return sb.String()
 }
 
 func (f *cliFlag) table() string {
-	var s string
+	var sb strings.Builder
 
 	// Option
 	if f.short != "" {
-		s += "`-" + f.short + "`"
+		sb.WriteString("`-" + f.short + "`")
 
 		if f.long != "" {
-			s += ", "
+			sb.WriteString(", ")
 		}
 	}
 
 	if f.long != "" {
-		s += "`--" + f.long + "`"
+		sb.WriteString("`--" + f.long + "`")
 	}
 
 	// Separator
-	s += " | "
+	sb.WriteString(" | ")
 
 	// Args
 	if f.thetype != "" {
-		s += "`" + f.thetype + "`"
+		sb.WriteString("`" + f.thetype + "`")
 	}
 
 	// Separator
-	s += " | "
+	sb.WriteString(" | ")
 
 	// Description
-	s += f.desc + "\n"
+	sb.WriteString(f.desc + "\n")
 
-	return s
+	return sb.String()
 }
 
 func (f *cliFlag) updateMaxWidth() {

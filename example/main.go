@@ -36,6 +36,7 @@ func init() {
 	cli.Authors = []string{"Miles Whittaker <mj@whitta.dev>"}
 	cli.Banner = os.Args[0] + " [OPTIONS] <arg>"
 	cli.BugEmail = "cli.bugs@whitta.dev"
+
 	cli.ExitStatus(
 		"Normally the exit status is 0. In the event of an error the",
 		"exit status will be one of the below:\n\n",
@@ -53,7 +54,9 @@ func init() {
 		"eget sagittis leo. Interdum et malesuada fames ac ante",
 		"ipsum primis in faucibus.",
 	)
+
 	cli.MaxWidth = 80 // Defaults to 80
+
 	cli.Section(
 		"CUSTOM SECTION EXAMPLE",
 		"Nunc lectus metus, consectetur et tellus tempus, accumsan",
@@ -75,6 +78,7 @@ func init() {
 		"fermentum lorem, non convallis enim urna rutrum mauris.\n",
 		"duis::In scelerisque mauris.",
 	)
+
 	cli.SeeAlso = []string{
 		"example1",
 		"example2",

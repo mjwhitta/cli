@@ -10,28 +10,29 @@ type section struct {
 }
 
 // String will return a string representation of the section.
-func (s section) String() (ret string) {
+func (s section) String() string {
 	var key string
 	var keyMaxLen int
+	var sb strings.Builder
 	var val string
 	var wrapped []string
 
 	if s.md {
-		ret += "\n## " + s.title + "\n\n"
+		sb.WriteString("\n## " + s.title + "\n\n")
 
 		for _, line := range wrap(s.text, MaxWidth) {
-			ret += line + "\n"
+			sb.WriteString(line + "\n")
 		}
 	} else {
-		ret += s.title + "\n"
+		sb.WriteString(s.title + "\n")
 
 		if s.alignOn == "" {
 			for _, line := range wrap(s.text, MaxWidth-TabWidth) {
 				for range TabWidth {
-					ret += " "
+					sb.WriteString(" ")
 				}
 
-				ret += line + "\n"
+				sb.WriteString(line + "\n")
 			}
 		} else {
 			for _, line := range strings.Split(s.text, "\n") {
@@ -47,36 +48,37 @@ func (s section) String() (ret string) {
 				line = strings.TrimSpace(line)
 
 				key, val, _ = strings.Cut(line, s.alignOn)
-				//nolint:mnd // 4 is not a magic number
+				//nolint:mnd // 4 spaces for indent
 				wrapped = wrap(val, MaxWidth-TabWidth-keyMaxLen-4)
 
 				for i, line := range wrapped {
 					for range TabWidth {
-						ret += " "
+						sb.WriteString(" ")
 					}
 
 					if i == 0 {
-						ret += key
+						sb.WriteString(key)
+
 						for range keyMaxLen - len(key) {
-							ret += " "
+							sb.WriteString(" ")
 						}
 					} else {
 						for range keyMaxLen {
-							ret += " "
+							sb.WriteString(" ")
 						}
 					}
 
 					for range TabWidth {
-						ret += " "
+						sb.WriteString(" ")
 					}
 
-					ret += line + "\n"
+					sb.WriteString(line + "\n")
 				}
 			}
 		}
 
-		ret += "\n"
+		sb.WriteString("\n")
 	}
 
-	return ret
+	return sb.String()
 }
