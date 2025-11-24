@@ -2,6 +2,7 @@ package cli
 
 import (
 	"flag"
+	"math"
 	"strings"
 
 	"github.com/mjwhitta/errors"
@@ -97,8 +98,10 @@ func (f *cliFlag) column(align bool) string {
 	return sb.String()
 }
 
-//nolint:cyclop,gocyclo // sometimes ugly is necessary
+//nolint:cyclop,gocyclo,maintidx // I hate it too
 func (f *cliFlag) enable(s string) error {
+	var e error
+
 	if s == "" {
 		return nil
 	}
@@ -110,7 +113,7 @@ func (f *cliFlag) enable(s string) error {
 			break
 		}
 
-		return errors.Newf("invalid bool %v", f.val)
+		return errors.Newf("invalid bool %v for %s", f.val, f.name())
 	case *Counter:
 		flag.Var(ptr, s, f.desc)
 	case *float64:
@@ -119,23 +122,93 @@ func (f *cliFlag) enable(s string) error {
 			break
 		}
 
-		return errors.Newf("invalid float64 %v", f.val)
+		e = errors.Newf("invalid float64 %v for %s", f.val, f.name())
+
+		return e
 	case *FloatList:
 		flag.Var(ptr, s, f.desc)
 	case *int:
-		if val, ok := f.val.(int); ok {
+		switch val := f.val.(type) {
+		case int:
 			flag.IntVar(ptr, s, val, f.desc)
-			break
+			return nil
+		case int8:
+			flag.IntVar(ptr, s, int(val), f.desc)
+			return nil
+		case int16:
+			flag.IntVar(ptr, s, int(val), f.desc)
+			return nil
+		case int32:
+			flag.IntVar(ptr, s, int(val), f.desc)
+			return nil
+		case int64:
+			flag.IntVar(ptr, s, int(val), f.desc)
+			return nil
+		case uint:
+			if val <= math.MaxInt {
+				flag.IntVar(ptr, s, int(val), f.desc)
+				return nil
+			}
+		case uint8:
+			flag.IntVar(ptr, s, int(val), f.desc)
+			return nil
+		case uint16:
+			flag.IntVar(ptr, s, int(val), f.desc)
+			return nil
+		case uint32:
+			if val <= math.MaxInt32 {
+				flag.IntVar(ptr, s, int(val), f.desc)
+				return nil
+			}
+		case uint64:
+			if val <= math.MaxInt64 {
+				flag.IntVar(ptr, s, int(val), f.desc)
+				return nil
+			}
 		}
 
-		return errors.Newf("invalid int %v", f.val)
+		return errors.Newf("invalid int %v for %s", f.val, f.name())
 	case *int64:
-		if val, ok := f.val.(int64); ok {
+		switch val := f.val.(type) {
+		case int:
+			flag.Int64Var(ptr, s, int64(val), f.desc)
+			return nil
+		case int8:
+			flag.Int64Var(ptr, s, int64(val), f.desc)
+			return nil
+		case int16:
+			flag.Int64Var(ptr, s, int64(val), f.desc)
+			return nil
+		case int32:
+			flag.Int64Var(ptr, s, int64(val), f.desc)
+			return nil
+		case int64:
 			flag.Int64Var(ptr, s, val, f.desc)
-			break
+			return nil
+		case uint:
+			if val <= math.MaxInt {
+				flag.Int64Var(ptr, s, int64(val), f.desc)
+				return nil
+			}
+		case uint8:
+			flag.Int64Var(ptr, s, int64(val), f.desc)
+			return nil
+		case uint16:
+			flag.Int64Var(ptr, s, int64(val), f.desc)
+			return nil
+		case uint32:
+			if val <= math.MaxInt32 {
+				flag.Int64Var(ptr, s, int64(val), f.desc)
+				return nil
+			}
+		case uint64:
+			if val <= math.MaxInt64 {
+				flag.Int64Var(ptr, s, int64(val), f.desc)
+				return nil
+			}
 		}
 
-		return errors.Newf("invalid int64 %v", f.val)
+		return errors.Newf("invalid int64 %v for %s", f.val, f.name())
 	case *IntList:
 		flag.Var(ptr, s, f.desc)
 	case *string:
@@ -144,38 +217,116 @@ func (f *cliFlag) enable(s string) error {
 			break
 		}
 
-		return errors.Newf("invalid string %v", f.val)
+		e = errors.Newf("invalid string %v for %s", f.val, f.name())
+
+		return e
 	case *StringList:
 		flag.Var(ptr, s, f.desc)
 	case *uint:
-		if val, ok := f.val.(int); ok {
-			if val < 0 {
-				return errors.Newf("invalid uint %v", val)
+		switch val := f.val.(type) {
+		case int:
+			if val >= 0 {
+				flag.UintVar(ptr, s, uint(val), f.desc)
+				return nil
 			}
-
+		case int8:
+			if val >= 0 {
+				flag.UintVar(ptr, s, uint(val), f.desc)
+				return nil
+			}
+		case int16:
+			if val >= 0 {
+				flag.UintVar(ptr, s, uint(val), f.desc)
+				return nil
+			}
+		case int32:
+			if val >= 0 {
+				flag.UintVar(ptr, s, uint(val), f.desc)
+				return nil
+			}
+		case int64:
+			if val >= 0 {
+				flag.UintVar(ptr, s, uint(val), f.desc)
+				return nil
+			}
+		case uint:
+			flag.UintVar(ptr, s, val, f.desc)
+			return nil
+		case uint8:
 			flag.UintVar(ptr, s, uint(val), f.desc)
-
-			break
+			return nil
+		case uint16:
+			flag.UintVar(ptr, s, uint(val), f.desc)
+			return nil
+		case uint32:
+			flag.UintVar(ptr, s, uint(val), f.desc)
+			return nil
+		case uint64:
+			flag.UintVar(ptr, s, uint(val), f.desc)
+			return nil
 		}
 
-		return errors.Newf("invalid uint %v", f.val)
+		return errors.Newf("invalid uint %v for %s", f.val, f.name())
 	case *uint64:
-		if val, ok := f.val.(int64); ok {
-			if val < 0 {
-				return errors.Newf("invalid uint64 %v", val)
+		switch val := f.val.(type) {
+		case int:
+			if val >= 0 {
+				flag.Uint64Var(ptr, s, uint64(val), f.desc)
+				return nil
 			}
-
+		case int8:
+			if val >= 0 {
+				flag.Uint64Var(ptr, s, uint64(val), f.desc)
+				return nil
+			}
+		case int16:
+			if val >= 0 {
+				flag.Uint64Var(ptr, s, uint64(val), f.desc)
+				return nil
+			}
+		case int32:
+			if val >= 0 {
+				flag.Uint64Var(ptr, s, uint64(val), f.desc)
+				return nil
+			}
+		case int64:
+			if val >= 0 {
+				flag.Uint64Var(ptr, s, uint64(val), f.desc)
+				return nil
+			}
+		case uint:
 			flag.Uint64Var(ptr, s, uint64(val), f.desc)
-
-			break
+			return nil
+		case uint8:
+			flag.Uint64Var(ptr, s, uint64(val), f.desc)
+			return nil
+		case uint16:
+			flag.Uint64Var(ptr, s, uint64(val), f.desc)
+			return nil
+		case uint32:
+			flag.Uint64Var(ptr, s, uint64(val), f.desc)
+			return nil
+		case uint64:
+			flag.Uint64Var(ptr, s, val, f.desc)
+			return nil
 		}
 
-		return errors.Newf("invalid uint64 %v", f.val)
+		e = errors.Newf("invalid uint64 %v for %s", f.val, f.name())
+
+		return e
 	case *UintList:
 		flag.Var(ptr, s, f.desc)
 	}
 
 	return nil
+}
+
+func (f *cliFlag) name() string {
+	if f.long != "" {
+		return "--" + f.long
+	}
+
+	return "-" + f.short
 }
 
 func (f *cliFlag) processString(arg string) {
