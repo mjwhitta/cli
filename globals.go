@@ -35,7 +35,7 @@ var (
 	Title string
 
 	colWidth = columnWidth{
-		desc:  1024, //nolint:mnd // start with big number
+		desc:  1024, //nolint:mnd // Start with big number
 		left:  0,
 		long:  0,
 		short: 0,
