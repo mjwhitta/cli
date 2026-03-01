@@ -5,7 +5,7 @@ package cli
 import "os"
 
 // Version is the package version.
-const Version string = "1.14.0"
+const Version string = "1.14.1"
 
 var (
 	// Align determines if short and long cli flags are aligned or

@@ -14,15 +14,12 @@ func generateFuncs(typ string) string {
 	var typeList string = capType + "List"
 
 	// String() func
-	sb.WriteString(
-		fmt.Sprintf(
-			"// String returns a string representation of the %s.\n",
-			typeList,
-		),
+	fmt.Fprintf(
+		&sb,
+		"// String returns a string representation of the %s.\n",
+		typeList,
 	)
-	sb.WriteString(
-		fmt.Sprintf("func (list *%s) String() string {\n", typeList),
-	)
+	fmt.Fprintf(&sb, "func (list *%s) String() string {\n", typeList)
 	sb.WriteString("\tif len(*list) == 0 {\n")
 	sb.WriteString("\t\treturn \"[]\"\n")
 	sb.WriteString("\t}\n\n")
@@ -30,29 +27,26 @@ func generateFuncs(typ string) string {
 	sb.WriteString("}\n\n")
 
 	// Set() func
-	sb.WriteString(
-		fmt.Sprintf(
-			"// Set appends a %s to a %s.\n",
-			typ,
-			typeList,
-		),
+	fmt.Fprintf(
+		&sb,
+		"// Set appends a %s to a %s.\n",
+		typ,
+		typeList,
 	)
-	sb.WriteString(
-		fmt.Sprintf(
-			"func (list *%s) Set(val string) error {\n",
-			typeList,
-		),
+	fmt.Fprintf(
+		&sb,
+		"func (list *%s) Set(val string) error {\n",
+		typeList,
 	)
 
 	switch typ {
 	case "float":
 		sb.WriteString("\tvar e error\n")
-		sb.WriteString(fmt.Sprintf("\tvar v %s64\n\n", typ))
-		sb.WriteString(
-			fmt.Sprintf(
-				"\tif v, e = strconv.Parse%s(val, 64)",
-				capType,
-			),
+		fmt.Fprintf(&sb, "\tvar v %s64\n\n", typ)
+		fmt.Fprintf(
+			&sb,
+			"\tif v, e = strconv.Parse%s(val, 64)",
+			capType,
 		)
 		sb.WriteString("; e != nil {\n")
 		sb.WriteString(
@@ -63,12 +57,11 @@ func generateFuncs(typ string) string {
 		sb.WriteString("\t(*list) = append(*list, v)\n")
 	case "int", "uint":
 		sb.WriteString("\tvar e error\n")
-		sb.WriteString(fmt.Sprintf("\tvar v %s64\n\n", typ))
-		sb.WriteString(
-			fmt.Sprintf(
-				"\tif v, e = strconv.Parse%s(val, 0, 64); e != nil {",
-				capType,
-			),
+		fmt.Fprintf(&sb, "\tvar v %s64\n\n", typ)
+		fmt.Fprintf(
+			&sb,
+			"\tif v, e = strconv.Parse%s(val, 0, 64); e != nil {",
+			capType,
 		)
 		sb.WriteString(
 			"\n\t\treturn errors.Newf(\"failed to parse %s as ",
@@ -92,16 +85,13 @@ func generateTypes(typ string) string {
 	var typeList string = capType + "List"
 
 	// Type declaration
-	sb.WriteString(
-		fmt.Sprintf(
-			"\n// %s allows setting a value multiple times, as",
-			typeList,
-		),
+	fmt.Fprintf(
+		&sb,
+		"\n// %s allows setting a value multiple times, as",
+		typeList,
 	)
-	sb.WriteString(
-		fmt.Sprintf(" in:\n// --flag=%s1 --flag=%s2\n", typ, typ),
-	)
-	sb.WriteString(fmt.Sprintf("type %s []%s", typeList, typ))
+	fmt.Fprintf(&sb, " in:\n// --flag=%s1 --flag=%s2\n", typ, typ)
+	fmt.Fprintf(&sb, "type %s []%s", typeList, typ)
 
 	switch typ {
 	case "float", "int", "uint":
